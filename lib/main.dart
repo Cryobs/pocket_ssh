@@ -50,50 +50,58 @@ class _RootPageState extends State<RootPage> {
           height: 90,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           color: const Color(0xFF171717),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return Stack(
-                children: [
-                  // CIEMNE TŁO PASKA
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white12,
-                      borderRadius: BorderRadius.circular(40),
-                    ),
-                  ),
-                  // ZIELONE PODŚWIETLENIE - przemieszcza się w szarym kontenerze
-                  AnimatedPositioned(
-                    left: _getLeftPosition(int_currentIndex, constraints.maxWidth),
-                    top: 10,
-                    duration: const Duration(milliseconds: 400),
-                    curve: Curves.easeInOut,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 400),
-                      curve: Curves.easeInOut,
-                      width: _getWidth(int_currentIndex),
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF22C55E),
-                        borderRadius: BorderRadius.circular(50),
+          child: Center(
+            child: Container(
+              width: 355,
+              height: 70,
+              decoration: BoxDecoration(
+                color: Colors.white12,
+                borderRadius: BorderRadius.circular(40),
+              ),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  const double highlightMargin = 10.0;
+
+                  return Stack(
+                    children: [
+                      // GREEN HIGHLIGHT
+                      AnimatedPositioned(
+                        left: _getLeftPosition(int_currentIndex, constraints.maxWidth, highlightMargin),
+                        top: highlightMargin,
+                        duration: const Duration(milliseconds: 400),
+                        curve: Curves.easeInOut,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 400),
+                          curve: Curves.easeInOut,
+                          width: _getWidth(int_currentIndex),
+                          height: constraints.maxHeight - (highlightMargin * 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF22C55E),
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  // IKONY + TEKST AKTYWNEGO PRZYCISKU - dynamicznie rozmieszczone
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _navItem(Icons.home_rounded, "Home", 0),
-                        _navItem(Icons.terminal, "SSH", 1),
-                        _navItem(Icons.arrow_circle_down_rounded, "Shortcuts", 2),
-                        _navItem(Icons.settings, "Settings", 3),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            },
+                      // ICONS & TEXT
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: highlightMargin,
+                          vertical: highlightMargin,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _navItem(Icons.home_rounded, "Home", 0),
+                            _navItem(Icons.terminal, "SSH", 1),
+                            _navItem(Icons.arrow_circle_down_rounded, "Shortcuts", 2),
+                            _navItem(Icons.settings, "Settings", 3),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
           ),
         ),
       ),
@@ -165,25 +173,26 @@ class _RootPageState extends State<RootPage> {
     return iconWidth + padding + spacing + (textWidths[index] ?? 0);
   }
 
-  double _getLeftPosition(int index, double totalWidth) {
-    const double iconOnlyWidth = 28 + 24; // ikona + padding
+  double _getLeftPosition(int index, double containerWidth, double margin) {
+    const double iconOnlyWidth = 28 + 24; // icon + padding
 
-    Map<int, double> itemWidths = {
-      0: int_currentIndex == 0 ? _getWidth(0) : iconOnlyWidth,
-      1: int_currentIndex == 1 ? _getWidth(1) : iconOnlyWidth,
-      2: int_currentIndex == 2 ? _getWidth(2) : iconOnlyWidth,
-      3: int_currentIndex == 3 ? _getWidth(3) : iconOnlyWidth,
-    };
+    double activeWidth = _getWidth(int_currentIndex);
 
-    double totalItemsWidth = itemWidths.values.reduce((a, b) => a + b);
+    List<double> buttonWidths = [];
+    for (int i = 0; i < 4; i++) {
+      buttonWidths.add(i == int_currentIndex ? activeWidth : iconOnlyWidth);
+    }
 
-    double availableSpace = totalWidth - totalItemsWidth;
-    double spacing = availableSpace / 5;
+    double availableWidth = containerWidth - (margin * 2);
 
-    double leftPosition = spacing;
+    double totalButtonsWidth = buttonWidths.reduce((a, b) => a + b);
+
+    double spacing = (availableWidth - totalButtonsWidth) / 3;
+
+    double leftPosition = margin;
 
     for (int i = 0; i < index; i++) {
-      leftPosition += itemWidths[i]! + spacing;
+      leftPosition += buttonWidths[i] + spacing;
     }
 
     return leftPosition;
