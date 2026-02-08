@@ -405,6 +405,12 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "14.2.1"
+sdks:
+  dart: ">=3.3.0 <4.0.0"
+  flutter: ">=3.18.0-18.0.pre.54"
+      url: "https://pub.dev"
+    source: hosted
+    version: "14.2.1"
   win32:
     dependency: transitive
     description:
@@ -440,3 +446,4 @@ packages:
 sdks:
   dart: ">=3.3.0 <4.0.0"
   flutter: ">=3.19.0"
+
