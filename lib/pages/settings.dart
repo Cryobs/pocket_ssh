@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pocket_ssh/services/settings_storage.dart';
 import 'package:pocket_ssh/widgets/input_text.dart';
+import 'package:pocket_ssh/widgets/input_pass.dart';
 import 'package:provider/provider.dart';
 
 
@@ -14,44 +15,44 @@ class SettingsPage extends StatelessWidget {
     final settings = context.watch<SettingsController>();
 
     return SafeArea(
-      child: Center(
-          child: Container(
-            width: 355,
-            margin: const EdgeInsets.all(26),
-            child: Column(
-              children: [
-                const Row(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(bottom: 13),
-                      child: Text("Settings", style: TextStyle(color: Colors.white, fontSize: 36)),
-                    ),
-                  ],
-                ),
-                Expanded(
-                  child: Container(
+      child: SingleChildScrollView(
+        child: Center(
+            child: Container(
+              width: 355,
+              margin: const EdgeInsets.all(26),
+              child: Column(
+                children: [
+                  const Row(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 13),
+                        child: Text("Settings", style: TextStyle(color: Colors.white, fontSize: 36)),
+                      ),
+                    ],
+                  ),
+                  Container(
                     width: 355,
-                    padding: EdgeInsets.all(37),
+                    height: 650,
+                    padding: const EdgeInsets.all(37),
                     decoration: BoxDecoration(
                       color: const Color(0xFF262626),
                       borderRadius: BorderRadius.circular(40),
                     ),
                     child: const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         InputText(
                           label: "Name",
                           hint: "Your Name",
                         )
+                        InputPass(),
                       ],
                     ),
-                  ),
-                )
-              ],
+                  )
+                ],
+              ),
             ),
           ),
-        ),
+      ),
     );
   }
 
