@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:pocket_ssh/widgets/circle_diagram.dart';
 
 void main() {
   runApp(const MyApp());
@@ -32,38 +32,10 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late List<GPData> _chartData;
-  @override
-  void initState() {
-    _chartData = getChartData();
-    super.initState();
-  }
+
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: Scaffold(
-          body: SfCircularChart(series: <CircularSeries>[PieSeries<GPData, String>(
-          dataSource: _chartData,
-          xValueMapper: (GPData data,_) => data.continent,
-          yValueMapper: (GPData data,_) => data.gdp,
-          ),]), // 4:13 min tutorial
-        )
-    );
-  }
-    List<GPData> getChartData(){
-      final List<GPData> chartData = [
-        GPData('Oceania', 1600)
-      ];
-      return chartData;
-    }
+    return const CircleDiagram();
 
   }
-
-class GPData {
-    GPData(this.continent, this.gdp);
-    final String continent;
-    final int gdp;
-
-  }
-
-
+}
