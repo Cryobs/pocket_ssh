@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:pocket_ssh/services/settings_storage.dart';
 import 'package:pocket_ssh/widgets/input_text.dart';
 import 'package:pocket_ssh/widgets/input_pass.dart';
@@ -43,7 +42,7 @@ class SettingsPage extends StatelessWidget {
                         InputText(
                           label: "Name",
                           hint: "Your Name",
-                        )
+                        ),
                         InputPass(),
                       ],
                     ),
