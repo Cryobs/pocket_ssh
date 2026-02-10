@@ -64,7 +64,7 @@ class Server {
 
       String? password;
       if (authType == AuthType.password && _passwordKey != null) {
-        password = await getPasswordFromStorage(_passwordKey!);
+        password = await getValueFromStorage(_passwordKey!);
       }
 
       final socket = await SSHSocket.connect(host, port);
