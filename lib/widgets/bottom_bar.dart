@@ -21,7 +21,7 @@ class BottomBar extends StatelessWidget {
   static const double _barWidth = 355;
   static const double _safePadding = 10;
   static const double _iconSize = 28;
-  static const double _itemHPadding = 12;
+  static const double _itemHPadding = 18;
   static const double _textSpacing = 6;
   static const int _animDuration = 400;
 
@@ -30,7 +30,7 @@ class BottomBar extends StatelessWidget {
   static const int _highlightColor = 0xFF22C55E;
 
   static const double _barRadius = 40;
-  static const double _highlightRadius = 80;
+  static const double _highlightRadius = 90;
 
 
   static final TextStyle _textStyle = TextStyle(
@@ -102,35 +102,44 @@ class BottomBar extends StatelessWidget {
   Widget _navItem(NavItem item, int index) {
     bool isSelected = currentIndex == index;
 
-    return GestureDetector(
-      onTap: () {onChanged(index);},
+return GestureDetector(
+  behavior: HitTestBehavior.opaque,
+  onTap: () {
+    onChanged(index);
+  },
+    child: SizedBox(
+      height: 100,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: _animDuration),
-        height: 50,
         padding: const EdgeInsets.symmetric(horizontal: _itemHPadding),
         child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               item.icon,
-              color: isSelected ? Colors.black.withOpacity(0.6) : Colors.white.withOpacity(0.3),
+              color: isSelected
+              ? Colors.black.withOpacity(0.6)
+              : Colors.white.withOpacity(0.3),
               size: _iconSize,
-            ),
-            AnimatedSize(
-              duration: const Duration(milliseconds: _animDuration),
-              child: isSelected
-                  ? Row(
-                      children: [
-                        const SizedBox(width: _textSpacing),
-                        Text(item.label, style: _textStyle),
-                      ],
-                    )
-                  : const SizedBox.shrink(),
-            ),
-          ],
+              ),
+            AnimatedSize(duration: const Duration(milliseconds: _animDuration),
+            child: isSelected
+              ? Row(
+              children: [
+                const SizedBox(width: _textSpacing,),
+                Text(item.label, style: _textStyle,),
+              ],
+            )
+          :const SizedBox.shrink(),
+            )],
         ),
       ),
-    );
+    ),);
   }
+
+
+
+
 
   double _textWidth(String text) {
     final textPainter = TextPainter(
