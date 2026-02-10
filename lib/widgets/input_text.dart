@@ -18,20 +18,21 @@ class _InputTextState extends State<InputText> {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Text(widget.label, style: TextStyle(color: Colors.white)),
+        Text(widget.label, style: const TextStyle(color: Colors.white, fontSize: 16)),
         Expanded(
             child: Padding(
               padding: const EdgeInsets.only(left: 8),
               child: TextField(
+                cursorColor: Colors.white,
                 decoration: InputDecoration(
                   hintText: widget.hint,
-                  hintStyle: TextStyle(
+                  hintStyle: const TextStyle(
                     color: Colors.white38
                   ),
                   border: InputBorder.none,
                 ),
                 textAlign: TextAlign.end,
-                style: TextStyle(color: Colors.white),
+                style: const TextStyle(color: Colors.white),
               ),
             )
         )

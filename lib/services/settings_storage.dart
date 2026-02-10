@@ -46,17 +46,31 @@ class SettingsRepository {
 
 class SettingsController extends ChangeNotifier {
   final SettingsRepository repo;
+
   late AppSettings _settings;
+  late AppSettings _draft;
 
   AppSettings get settings => _settings;
+  AppSettings get draft => _draft;
 
   SettingsController(this.repo) {
     _settings = repo.load();
+    _draft = _settings;
   }
 
-  void setRefreshRate(int value) {
-    _settings = _settings.copyWith(refreshRate: value);
-    repo.save(_settings);
+  void setRefreshRateDraft(int value) {
+    _draft = _draft.copyWith(refreshRate: value);
+    notifyListeners();
+  }
+
+  Future<void> save() async {
+    _settings = _draft;
+    await repo.save(_settings);
+    notifyListeners();
+  }
+
+  void reset() {
+    _draft = _settings;
     notifyListeners();
   }
 }

@@ -44,7 +44,7 @@ class _TemplateState extends State<Template> {
         primaryColor: const Color(_primaryColor),
         colorScheme: ColorScheme.fromSwatch(
           primarySwatch: primarySwatch,
-          accentColor: const Color(_primaryColor),
+          accentColor: const Color(_accentColor),
         )
       ),
       home: Scaffold(
