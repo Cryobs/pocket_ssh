@@ -1,58 +1,54 @@
 import 'package:flutter/material.dart';
 
-class InputBigText extends StatefulWidget {
+class InputBigText extends StatelessWidget {
   final String label;
-  final String hint;
+  final TextEditingController? controller;
+
   const InputBigText({
     super.key,
     required this.label,
-    this.hint = "",
+    this.controller,
   });
-
-  @override
-  State<StatefulWidget> createState() => _InputBigTextState();
-}
-class _InputBigTextState extends State<InputBigText> {
-
-  static const Color INPUT_COLOR = Colors.black38;
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Align(
-          alignment: Alignment.bottomLeft,
-          child: Text(widget.label, style: const TextStyle(color: Colors.white, fontSize: 16))
+        Text(
+          label,
+          style: const TextStyle(color: Colors.white, fontSize: 16),
         ),
-        const SizedBox(height: 15,),
+        const SizedBox(height: 8),
         TextField(
-          maxLines: 5,
+          controller: controller,
           cursorColor: Colors.white,
+          maxLines: 10,
           decoration: InputDecoration(
-            hintText: widget.hint,
-            hintStyle: const TextStyle(
-              color: Colors.white38
-            ),
+            hintText: "Paste your private key here...",
+            hintStyle: const TextStyle(color: Colors.white38),
             filled: true,
+            fillColor: Colors.white12,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: INPUT_COLOR),
+              borderSide: const BorderSide(color: Colors.white38),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: INPUT_COLOR),
+              borderSide: const BorderSide(color: Colors.white38),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: INPUT_COLOR),
+              borderSide: const BorderSide(color: Colors.white),
             ),
-            fillColor: INPUT_COLOR,
           ),
-          style: const TextStyle(color: Colors.white),
-        )
+          style: const TextStyle(
+            color: Colors.white,
+            fontFamily: 'monospace',
+            fontSize: 12,
+          ),
+        ),
       ],
     );
   }
 }
-
-

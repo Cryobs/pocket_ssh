@@ -1,45 +1,60 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:pocket_ssh/pages/private_key_page.dart';
+import 'package:pocket_ssh/services/private_key_controller.dart';
+import 'package:provider/provider.dart';
 
-
-class PrivateKey {
-  final String id;
-  final String name;
-  final String key;
-
-  PrivateKey({
-    required this.id,
-    required this.name,
-    required this.key,
-  });
-}
-
-class PrivateKeyList extends StatefulWidget {
+class PrivateKeyList extends StatelessWidget {
   const PrivateKeyList({super.key});
 
-  @override
-  State<StatefulWidget> createState() => _PrivateKeyListState();
-}
+  void _navigateToAddKey(BuildContext context) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const PrivateKeyPage(),
+      ),
+    );
 
-class _PrivateKeyListState extends State<PrivateKeyList>{
-  List<PrivateKey> keys = [];
+    if (result == true && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Key added successfully"),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
 
-  @override
-  void initState() {
-    super.initState();
+  void _navigateToEditKey(BuildContext context, String keyId) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PrivateKeyPage(keyId: keyId),
+      ),
+    );
 
-    keys = [
-      PrivateKey(id: "0", name: "Server", key: "some key"),
-    ];
+    if (result == true && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Key updated successfully"),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final keyController = context.watch<PrivateKeyController>();
+    final keys = keyController.keys;
+
     return Column(
       children: [
         const Align(
           alignment: Alignment.bottomLeft,
-          child: Text("Private Keys", style: TextStyle(color: Colors.white, fontSize: 16),),
+          child: Text(
+            "Private Keys",
+            style: TextStyle(color: Colors.white, fontSize: 16),
+          ),
         ),
         const SizedBox(height: 12),
         ListView.separated(
@@ -48,12 +63,12 @@ class _PrivateKeyListState extends State<PrivateKeyList>{
           itemBuilder: (context, index) {
             if (index == keys.length) {
               return GestureDetector(
-                onTap: () {}, // Navigate to Add Key Page
+                onTap: () => _navigateToAddKey(context),
                 child: Container(
                   height: 50,
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.white38),
-                    borderRadius: BorderRadius.circular(12)
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Center(
                     child: Icon(Icons.add_circle_outline, color: Colors.white38),
@@ -62,8 +77,9 @@ class _PrivateKeyListState extends State<PrivateKeyList>{
               );
             }
 
+            // Элемент списка
             return GestureDetector(
-              onTap: () {},  // Navigate to Edit Key Page
+              onTap: () => _navigateToEditKey(context, keys[index].id),
               child: Container(
                 height: 50,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -74,16 +90,17 @@ class _PrivateKeyListState extends State<PrivateKeyList>{
                 child: Row(
                   children: [
                     const Icon(Icons.key, color: Colors.white, size: 20),
-                    const SizedBox(width: 12,),
+                    const SizedBox(width: 12),
                     Expanded(
-                        child: Text(
-                          keys[index].name,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16
-                          )
-                        )
-                    )
+                      child: Text(
+                        keys[index].name,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    const Icon(Icons.chevron_right, color: Colors.white38),
                   ],
                 ),
               ),
@@ -95,5 +112,4 @@ class _PrivateKeyListState extends State<PrivateKeyList>{
       ],
     );
   }
-
 }
