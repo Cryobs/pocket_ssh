@@ -53,10 +53,10 @@ class _AddServerPageState extends State<AddServerPage> {
         _usernameController.text = serverModel.username;
         _authType = serverModel.authType == 0 ? 'Password' : 'SSH Key';
 
-        if (serverModel.authType == 1 && serverModel.sshKeyId != null) {
-          _selectedKeyId = serverModel.sshKeyId;
+        if (serverModel.authType == 1 && serverModel.sshKey != null) {
+          _selectedKeyId = serverModel.sshKey;
           final privateKeyController = context.read<PrivateKeyController>();
-          final key = privateKeyController.getKey(serverModel.sshKeyId!);
+          final key = privateKeyController.getKey(serverModel.sshKey!);
           _selectedKeyName = key?.name ?? 'None';
         }
 

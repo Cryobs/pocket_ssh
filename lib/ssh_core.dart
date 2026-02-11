@@ -4,12 +4,14 @@ import 'package:dartssh2/dartssh2.dart';
 import 'services/secure_storage.dart';
 
 const CONNECTION_ATTEMPT = 5;
-const CPU_USAGE_CMD = "top -bn1 | grep \"Cpu(s)\" | awk '{print 100 - \$8}'";
+
+const CPU_USAGE_CMD = "grep 'cpu ' /proc/stat | awk '{usage=(\$2+\$4)*100/(\$2+\$4+\$5)} END {print usage}'";
+const CPU_USAGE_CMD_ALT = "mpstat 1 1 | awk '/Average/ {print 100 - \$NF}'";
+
 final STORAGE_USAGE_CMD = "df --block-size=1 --total | awk '/total/ {print \$3, \$2}'";
 const UPTIME_CMD = "uptime -p";
 const TEMP_CMD = "cat /sys/class/hwmon/hwmon*/temp1_input 2>/dev/null | head -n1";
 const MEM_USAGE_CMD = "free -b | awk '/Mem:/ {printf(\"%d %d\", \$3, \$2)}'";
-
 
 enum AuthType {
   password,
@@ -23,7 +25,28 @@ enum ServerStatus {
   error,
 }
 
+extension ServerCheck on Server {
+  bool get isAlive {
+    if (client == null) {
+      status = ServerStatus.disconnected;
+      return false;
+    }
 
+    try {
+      // Проверяем, что клиент всё ещё подключен
+      if (client!.isClosed) {
+        status = ServerStatus.disconnected;
+        client = null;
+        return false;
+      }
+      return true;
+    } catch (e) {
+      status = ServerStatus.disconnected;
+      client = null;
+      return false;
+    }
+  }
+}
 
 class Server {
   final String id;
@@ -31,18 +54,12 @@ class Server {
   final String host;
   final int port;
   final String username;
-
   Statistics? stat;
-
   final AuthType authType;
   String? _passwordKey;
   final String? sshKey;
-
   ServerStatus status;
-
-  SSHClient? _client;
-
-
+  SSHClient? client;
 
   Server({
     required this.id,
@@ -60,8 +77,9 @@ class Server {
   String? get passwordKey => _passwordKey;
   set passwordKey(String? key) => _passwordKey = key;
 
-  /* ==== SSH ==== */
   Future<void> connect() async {
+    if (status == ServerStatus.connecting) return;
+
     try {
       status = ServerStatus.connecting;
 
@@ -70,9 +88,10 @@ class Server {
         password = await getValueFromStorage(_passwordKey!);
       }
 
-      final socket = await SSHSocket.connect(host, port);
+      final socket = await SSHSocket.connect(host, port)
+          .timeout(const Duration(seconds: 10));
 
-      _client = SSHClient(
+      client = SSHClient(
         socket,
         username: username,
         onPasswordRequest: password != null ? () => password : null,
@@ -81,98 +100,179 @@ class Server {
             : null,
       );
 
-
       status = ServerStatus.connected;
     } catch (e) {
       status = ServerStatus.error;
+      client = null;
       print("SSH ERROR: $e");
     }
   }
 
   Future<void> disconnect() async {
-    _client!.close();
+    client?.close();
+    client = null;
     status = ServerStatus.disconnected;
   }
 
   Future<String> exec(String command) async {
     int counter = 0;
-    while (_client == null && counter < CONNECTION_ATTEMPT) {
+    while (client == null && counter < CONNECTION_ATTEMPT) {
       await connect();
       counter++;
     }
-    if (_client == null) throw Exception("SSH client not connected");
-    final result = await _client!.run(command);
-    return utf8.decode(result);
-  }
+    if (client == null) throw Exception("SSH client not connected");
 
+    try {
+      final result = await client!.run(command);
+      return utf8.decode(result);
+    } catch (e) {
+      status = ServerStatus.disconnected;
+      client = null;
+      rethrow;
+    }
+  }
 
   Future<SSHSession?> openSession() async {
     int counter = 0;
-    while (_client == null && counter < CONNECTION_ATTEMPT) {
+    while (client == null && counter < CONNECTION_ATTEMPT) {
       await connect();
       counter++;
     }
-    if (_client == null) throw Exception("SSH client not connected");
+    if (client == null) throw Exception("SSH client not connected");
 
-    final session = await _client!.shell(
-      pty: const SSHPtyConfig(
-        width: 80,
-        height: 25,
-      ),
-    );
-
-    return session;
+    try {
+      final session = await client!.shell(
+        pty: const SSHPtyConfig(
+          width: 80,
+          height: 25,
+        ),
+      );
+      return session;
+    } catch (e) {
+      status = ServerStatus.disconnected;
+      client = null;
+      rethrow;
+    }
   }
-  /* ==== Statistics ==== */
+
   Future<void> getCPU() async {
-    stat?.cpu = double.parse((await exec(CPU_USAGE_CMD)).trim());
+    try {
+      final result = (await exec(CPU_USAGE_CMD)).trim();
+      final cpuValue = double.tryParse(result);
+
+      if (cpuValue != null && cpuValue >= 0 && cpuValue <= 100) {
+        stat?.cpu = cpuValue;
+      } else {
+        try {
+          final altResult = (await exec(CPU_USAGE_CMD_ALT)).trim();
+          final altCpuValue = double.tryParse(altResult);
+          if (altCpuValue != null && altCpuValue >= 0 && altCpuValue <= 100) {
+            stat?.cpu = altCpuValue;
+          } else {
+            stat?.cpu = 0;
+          }
+        } catch (e) {
+          stat?.cpu = 0;
+        }
+      }
+    } catch (e) {
+      print("CPU ERROR: $e");
+      stat?.cpu = 0;
+    }
   }
 
   Future<void> getMEM() async {
-    final result = (await exec(MEM_USAGE_CMD)).trim();
-    final parts = result.split(" ");
-    if (parts.length == 2) {
-      final used = double.parse(parts[0]);
-      final total = double.parse(parts[1]);
-      stat?.memUsed = used / 1024 / 1024 / 1024; /* GB */
-      stat?.memTotal = total / 1024 / 1024 / 1024; /* GB */
-      stat?.mem = (used / total) * 100;
+    try {
+      final result = (await exec(MEM_USAGE_CMD)).trim();
+      final parts = result.split(" ");
+      if (parts.length == 2) {
+        final used = double.tryParse(parts[0]);
+        final total = double.tryParse(parts[1]);
+
+        if (used != null && total != null && total > 0) {
+          stat?.memUsed = used / 1024 / 1024 / 1024;
+          stat?.memTotal = total / 1024 / 1024 / 1024;
+          stat?.mem = (used / total) * 100;
+        } else {
+          stat?.mem = 0;
+          stat?.memUsed = 0;
+          stat?.memTotal = 0;
+        }
+      }
+    } catch (e) {
+      print("MEM ERROR: $e");
+      stat?.mem = 0;
     }
   }
 
   Future<void> getStorage() async {
-    final result = (await exec(STORAGE_USAGE_CMD)).trim();
-    final parts = result.split(" ");
-    if (parts.length == 2) {
-      final used = double.parse(parts[0]);
-      final total = double.parse(parts[1]);
-      stat?.storageUsed = used / 1024 / 1024 / 1024; /* GB */
-      stat?.storageTotal = total / 1024 / 1024 / 1024; /* GB */
-      stat?.storage = (used / total) * 100;
+    try {
+      final result = (await exec(STORAGE_USAGE_CMD)).trim();
+      final parts = result.split(" ");
+      if (parts.length == 2) {
+        final used = double.tryParse(parts[0]);
+        final total = double.tryParse(parts[1]);
+
+        if (used != null && total != null && total > 0) {
+          stat?.storageUsed = used / 1024 / 1024 / 1024;
+          stat?.storageTotal = total / 1024 / 1024 / 1024;
+          stat?.storage = (used / total) * 100;
+        } else {
+          stat?.storage = 0;
+          stat?.storageUsed = 0;
+          stat?.storageTotal = 0;
+        }
+      }
+    } catch (e) {
+      print("STORAGE ERROR: $e");
+      stat?.storage = 0;
     }
   }
 
   Future<void> getUptime() async {
-    final output = (await exec(UPTIME_CMD)).trim();
-    final parts = output.split(RegExp(r',?\s+'));
+    try {
+      final output = (await exec(UPTIME_CMD)).trim();
+      final parts = output.split(RegExp(r',?\s+'));
 
-    for (int i = 1; i < parts.length; i++) {
-      if (parts[i].startsWith('day')) {
-        stat?.uptime = '${parts[i - 1]} d';
-        break;
-      } else if (parts[i].startsWith('hour')) {
-        stat?.uptime = '${parts[i - 1]} h';
-        break;
-      } else if (parts[i].startsWith('minute')) {
-        stat?.uptime = '${parts[i-1]} m';
-        break;
+      bool found = false;
+      for (int i = 1; i < parts.length; i++) {
+        if (parts[i].startsWith('day')) {
+          stat?.uptime = '${parts[i - 1]} d';
+          found = true;
+          break;
+        } else if (parts[i].startsWith('hour')) {
+          stat?.uptime = '${parts[i - 1]} h';
+          found = true;
+          break;
+        } else if (parts[i].startsWith('minute')) {
+          stat?.uptime = '${parts[i - 1]} m';
+          found = true;
+          break;
+        }
       }
+
+      if (!found) {
+        stat?.uptime = "?";
+      }
+    } catch (e) {
+      print("UPTIME ERROR: $e");
+      stat?.uptime = "?";
     }
   }
 
   Future<void> getTemp() async {
-    var temp = (await exec(TEMP_CMD)).trim();
-    stat?.temp = temp.isNotEmpty ? double.parse(temp)/1000 : 0;
+    try {
+      var temp = (await exec(TEMP_CMD)).trim();
+      if (temp.isNotEmpty) {
+        final tempValue = double.tryParse(temp);
+        stat?.temp = tempValue != null ? tempValue / 1000 : 0;
+      } else {
+        stat?.temp = 0;
+      }
+    } catch (e) {
+      print("TEMP ERROR: $e");
+      stat?.temp = 0;
+    }
   }
 
   Future<void> updateStats() async {
@@ -184,30 +284,26 @@ class Server {
   }
 }
 
-
-
 class Statistics {
-  double cpu; /* % usage */
-  double mem; /* % used */
-  double storage; /* % used */
-  double temp; /* C */
-  String uptime; /* days, hours, minutes */
-
-  double memUsed; /* GB */
-  double memTotal; /* GB */
-  double storageUsed; /* GB */
-  double storageTotal; /* GB */
+  double cpu;
+  double mem;
+  double storage;
+  double temp;
+  String uptime;
+  double memUsed;
+  double memTotal;
+  double storageUsed;
+  double storageTotal;
 
   Statistics({
-    this.cpu = 0, /* % usage */
-    this.mem = 0, /* % used */
-    this.storage = 0, /* % used */
-    this.temp = 0, /* C */
-    this.uptime = "?", /* days, hours, minutes */
-
-    this.memUsed = 0, /* GB */
-    this.memTotal = 0, /* GB */
-    this.storageUsed = 0, /* GB */
-    this.storageTotal = 0, /* GB */
+    this.cpu = 0,
+    this.mem = 0,
+    this.storage = 0,
+    this.temp = 0,
+    this.uptime = "?",
+    this.memUsed = 0,
+    this.memTotal = 0,
+    this.storageUsed = 0,
+    this.storageTotal = 0,
   });
 }

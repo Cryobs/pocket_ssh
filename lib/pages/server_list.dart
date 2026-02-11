@@ -17,6 +17,14 @@ class ServerList extends StatefulWidget {
 
 class _ServerListState extends State<ServerList> {
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _autoConnectServers();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(20),
@@ -37,7 +45,6 @@ class _ServerListState extends State<ServerList> {
                       onLongPress: () => _showServerOptions(context, server),
                     ),
                   )),
-
                   if (servers.isEmpty)
                     const Padding(
                       padding: EdgeInsets.only(bottom: 20),
@@ -52,7 +59,6 @@ class _ServerListState extends State<ServerList> {
                         ),
                       ),
                     ),
-
                   AddServerWidget(
                     onTap: () => _navigateToAddServer(context),
                   ),
@@ -86,7 +92,6 @@ class _ServerListState extends State<ServerList> {
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Text(
@@ -98,9 +103,7 @@ class _ServerListState extends State<ServerList> {
                   ),
                 ),
               ),
-
               const Divider(color: Colors.white24, height: 1),
-
               ListTile(
                 leading: const Icon(Icons.edit, color: Colors.white),
                 title: const Text(
@@ -112,7 +115,6 @@ class _ServerListState extends State<ServerList> {
                   _editServer(context, server.id);
                 },
               ),
-
               ListTile(
                 leading: const Icon(Icons.delete, color: Color(0xFFE9220C)),
                 title: const Text(
@@ -124,7 +126,6 @@ class _ServerListState extends State<ServerList> {
                   _confirmDeleteServer(context, server);
                 },
               ),
-
               const SizedBox(height: 8),
             ],
           ),
@@ -194,7 +195,7 @@ class _ServerListState extends State<ServerList> {
 
     if (confirm != true || !mounted) return;
 
-    final serverModel = controller.getServer(server.id);
+    final serverModel = controller.getServerModel(server.id);
 
     try {
       if (serverModel?.passwordKey != null) {
@@ -205,38 +206,38 @@ class _ServerListState extends State<ServerList> {
 
       if (mounted) {
         setState(() {});
-        try {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Server deleted'),
-              backgroundColor: Color(0xFF22C55E),
-            ),
-          );
-        } catch (_) {
-        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Server deleted'),
+            backgroundColor: Color(0xFF22C55E),
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {
-        try {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error deleting server: $e'),
-              backgroundColor: const Color(0xFFE9220C),
-            ),
-          );
-        } catch (_) {
-        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error deleting server: $e'),
+            backgroundColor: const Color(0xFFE9220C),
+          ),
+        );
       }
     }
   }
 
-  void _connectToServer(BuildContext context, Server server) {
-    // TODO: Server connect
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Connecting to ${server.name}...'),
-        duration: const Duration(seconds: 1),
-      ),
-    );
+  void _connectToServer(BuildContext context, Server server) async {
+    final controller = context.read<ServerController>();
+    await controller.connectToServer(server.id);
+  }
+
+  void _autoConnectServers() {
+    final controller = context.read<ServerController>();
+    final servers = controller.getAllServers();
+
+    for (final server in servers) {
+      if (server.status != ServerStatus.connected) {
+        controller.connectToServer(server.id);
+      }
+    }
   }
 }

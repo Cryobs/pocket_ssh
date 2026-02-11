@@ -20,7 +20,7 @@ class ServerModel extends HiveObject {
   final String username;
 
   @HiveField(5)
-  final int authType;
+  final int authType; // 0 = password, 1 = ssh key
 
   @HiveField(6)
   final String? passwordKey;
@@ -38,26 +38,4 @@ class ServerModel extends HiveObject {
     this.passwordKey,
     this.sshKeyId,
   });
-
-  ServerModel copyWith({
-    String? id,
-    String? name,
-    String? host,
-    int? port,
-    String? username,
-    int? authType,
-    String? passwordKey,
-    String? sshKeyId,
-  }) {
-    return ServerModel(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      host: host ?? this.host,
-      port: port ?? this.port,
-      username: username ?? this.username,
-      authType: authType ?? this.authType,
-      passwordKey: passwordKey ?? this.passwordKey,
-      sshKeyId: sshKeyId ?? this.sshKeyId,
-    );
-  }
 }

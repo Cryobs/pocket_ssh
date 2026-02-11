@@ -11,17 +11,12 @@ import 'package:pocket_ssh/services/server_repo.dart';
 import 'package:pocket_ssh/services/settings_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'models/server.dart';
-
-
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Hive.initFlutter();
-
   Hive.registerAdapter(PrivateKeyAdapter());
   Hive.registerAdapter(ServerModelAdapter());
 
@@ -32,18 +27,24 @@ void main() async {
   await serverRepo.init();
 
   final prefs = await SharedPreferences.getInstance();
+  final settingsRepo = SettingsRepository(prefs);
+  final settingsController = SettingsController(settingsRepo);
 
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-          create: (_) => SettingsController(SettingsRepository(prefs)),
+        ChangeNotifierProvider.value(
+          value: settingsController,
         ),
         ChangeNotifierProvider(
           create: (_) => PrivateKeyController(privateKeyRepo),
         ),
         ChangeNotifierProvider(
-          create: (_) => ServerController(serverRepo, privateKeyRepo),
+          create: (_) => ServerController(
+            settingsController,  // Передаём settingsController
+            serverRepo,
+            privateKeyRepo,
+          ),
         ),
       ],
       child: Template(
