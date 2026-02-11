@@ -3,6 +3,7 @@ import 'package:pocket_ssh/widgets/bottom_bar.dart';
 
 
 
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 class Template extends StatefulWidget {
   final List<Widget> pages;
@@ -39,12 +40,15 @@ class _TemplateState extends State<Template> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      scaffoldMessengerKey: scaffoldMessengerKey,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        brightness: Brightness.dark,
         primaryColor: const Color(_primaryColor),
         colorScheme: ColorScheme.fromSwatch(
           primarySwatch: primarySwatch,
           accentColor: const Color(_accentColor),
+          brightness: Brightness.dark
         )
       ),
       home: Scaffold(

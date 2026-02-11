@@ -38,7 +38,8 @@ dependencies:
   hive_flutter: ^1.1.0
   flutter:
     sdk: flutter
-  syncfusion_flutter_charts: ^19.1.54
+  syncfusion_flutter_charts: ^32.2.3
+  uuid: ^4.5.2
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -99,3 +100,5 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+dependency_overrides:
+  pinenacl: ^0.6.0

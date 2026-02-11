@@ -48,11 +48,11 @@ class _TerminalScreenState extends State<TerminalScreen> {
 
     await _connectToServer();
     await server.updateStats();
-    print("CPU: ${server.stat.cpu}%");
-    print("MEM: ${server.stat.mem}% (${server.stat.memUsed}/${server.stat.memTotal})");
-    print("DISK: ${server.stat.storage}% (${server.stat.storageUsed}/${server.stat.storageTotal})");
-    print("TEMP: ${server.stat.temp} C");
-    print("UPTIME: ${server.stat.uptime}");
+    print("CPU: ${server.stat?.cpu}%");
+    print("MEM: ${server.stat?.mem}% (${server.stat?.memUsed}/${server.stat?.memTotal})");
+    print("DISK: ${server.stat?.storage}% (${server.stat?.storageUsed}/${server.stat?.storageTotal})");
+    print("TEMP: ${server.stat?.temp} C");
+    print("UPTIME: ${server.stat?.uptime}");
   }
 
   Future<void> _connectToServer() async {

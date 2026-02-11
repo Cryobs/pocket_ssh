@@ -1,44 +1,70 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:pocket_ssh/models/private_key.dart';
-import 'package:pocket_ssh/pages/private_key_page.dart';
+import 'package:pocket_ssh/pages/server_list.dart';
 import 'package:pocket_ssh/pages/settings.dart';
 import 'package:pocket_ssh/pages/template.dart';
 import 'package:pocket_ssh/services/private_key_controller.dart';
 import 'package:pocket_ssh/services/private_key_repo.dart';
+import 'package:pocket_ssh/services/server_controller.dart';
+import 'package:pocket_ssh/services/server_repo.dart';
 import 'package:pocket_ssh/services/settings_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'models/server.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Hive.initFlutter();
   Hive.registerAdapter(PrivateKeyAdapter());
+  Hive.registerAdapter(ServerModelAdapter());
 
   final privateKeyRepo = PrivateKeyRepo();
   await privateKeyRepo.init();
 
+  final serverRepo = ServerRepo();
+  await serverRepo.init();
+
   final prefs = await SharedPreferences.getInstance();
+  final settingsRepo = SettingsRepository(prefs);
+  final settingsController = SettingsController(settingsRepo);
 
   runApp(
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider(
-            create: (_) => SettingsController(SettingsRepository(prefs)),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(
+          value: settingsController,
+        ),
+        ChangeNotifierProvider(
+          create: (_) => PrivateKeyController(privateKeyRepo),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ServerController(
+            settingsController,  // Передаём settingsController
+            serverRepo,
+            privateKeyRepo,
           ),
-          ChangeNotifierProvider(
-            create: (_) => PrivateKeyController(privateKeyRepo),
+        ),
+      ],
+      child: Template(
+        pages: [
+          const ServerList(),
+          const Center(
+            child: Text(
+              "Page 1",
+              style: TextStyle(color: Colors.white),
+            ),
           ),
+          const Center(
+            child: Text(
+              "Page 2",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+          const SettingsPage(),
         ],
-        child: const Template(pages: [
-          Center(child: Text("Page 0", style: TextStyle(color: Colors.white),)),
-          Center(child: Text("Page 1", style: TextStyle(color: Colors.white),)),
-          Center(child: Text("Page 2", style: TextStyle(color: Colors.white),)),
-          SettingsPage(),
-      ],),
       ),
+    ),
   );
-
 }
-
