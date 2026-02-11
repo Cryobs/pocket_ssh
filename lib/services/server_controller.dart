@@ -14,7 +14,6 @@ class ServerController extends ChangeNotifier {
   final List<Server> _servers = [];
   Timer? _updateTimer;
   Timer? _healthCheckTimer;
-  bool _isUpdating = false;
 
   ServerController(
       this.settingsController,

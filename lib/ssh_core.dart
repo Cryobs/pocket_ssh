@@ -33,7 +33,6 @@ extension ServerCheck on Server {
     }
 
     try {
-      // Проверяем, что клиент всё ещё подключен
       if (client!.isClosed) {
         status = ServerStatus.disconnected;
         client = null;
