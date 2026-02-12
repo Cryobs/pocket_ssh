@@ -5,6 +5,15 @@ import 'services/secure_storage.dart';
 
 const CONNECTION_ATTEMPT = 5;
 
+const ALL_STATS_CMD = '''
+cpu_usage=\$(grep 'cpu ' /proc/stat | awk '{usage=(\$2+\$4)*100/(\$2+\$4+\$5)} END {print usage}')
+mem_info=\$(free -b | awk '/Mem:/ {printf("%d %d", \$3, \$2)}')
+storage_info=\$(df --block-size=1 --total | awk '/total/ {print \$3, \$2}')
+uptime_info=\$(uptime -p)
+temp_info=\$(cat /sys/class/hwmon/hwmon*/temp1_input 2>/dev/null | head -n1)
+echo "\$cpu_usage|\$mem_info|\$storage_info|\$uptime_info|\$temp_info"
+''';
+
 const CPU_USAGE_CMD = "grep 'cpu ' /proc/stat | awk '{usage=(\$2+\$4)*100/(\$2+\$4+\$5)} END {print usage}'";
 const CPU_USAGE_CMD_ALT = "mpstat 1 1 | awk '/Average/ {print 100 - \$NF}'";
 
@@ -58,6 +67,7 @@ class Server {
   String? _passwordKey;
   final String? sshKey;
   ServerStatus status;
+  bool online;
   SSHClient? client;
 
   Server({
@@ -71,6 +81,7 @@ class Server {
     this.sshKey,
     this.status = ServerStatus.disconnected,
     this.stat,
+    this.online = false,
   }) : _passwordKey = passwordKey;
 
   String? get passwordKey => _passwordKey;
@@ -151,6 +162,122 @@ class Server {
       status = ServerStatus.disconnected;
       client = null;
       rethrow;
+    }
+  }
+
+  Future<void> checkOnline() async {
+    if (status == ServerStatus.connected) {
+      online = true;
+      return;
+    }
+    try {
+      await connect();
+      if (status == ServerStatus.connected) {
+        online = true;
+        return;
+      }
+      await disconnect();
+    } catch (e) {
+      online = false;
+    }
+  }
+
+  Future<void> updateStatsOptimized() async {
+    try {
+      final result = (await exec(ALL_STATS_CMD)).trim();
+      final parts = result.split('|');
+
+      if (parts.length == 5) {
+        _parseCPU(parts[0]);
+        _parseMemory(parts[1]);
+        _parseStorage(parts[2]);
+        _parseUptime(parts[3]);
+        _parseTemp(parts[4]);
+      } else {
+        await updateStats();
+      }
+    } catch (e) {
+      print("OPTIMIZED STATS ERROR: $e");
+      await updateStats();
+    }
+  }
+
+  void _parseCPU(String cpuStr) {
+    final cpuValue = double.tryParse(cpuStr.trim());
+    if (cpuValue != null && cpuValue >= 0 && cpuValue <= 100) {
+      stat?.cpu = cpuValue;
+    } else {
+      stat?.cpu = 0;
+    }
+  }
+
+  void _parseMemory(String memStr) {
+    final parts = memStr.trim().split(" ");
+    if (parts.length == 2) {
+      final used = double.tryParse(parts[0]);
+      final total = double.tryParse(parts[1]);
+
+      if (used != null && total != null && total > 0) {
+        stat?.memUsed = used / 1024 / 1024 / 1024;
+        stat?.memTotal = total / 1024 / 1024 / 1024;
+        stat?.mem = (used / total) * 100;
+      } else {
+        stat?.mem = 0;
+        stat?.memUsed = 0;
+        stat?.memTotal = 0;
+      }
+    }
+  }
+
+  void _parseStorage(String storageStr) {
+    final parts = storageStr.trim().split(" ");
+    if (parts.length == 2) {
+      final used = double.tryParse(parts[0]);
+      final total = double.tryParse(parts[1]);
+
+      if (used != null && total != null && total > 0) {
+        stat?.storageUsed = used / 1024 / 1024 / 1024;
+        stat?.storageTotal = total / 1024 / 1024 / 1024;
+        stat?.storage = (used / total) * 100;
+      } else {
+        stat?.storage = 0;
+        stat?.storageUsed = 0;
+        stat?.storageTotal = 0;
+      }
+    }
+  }
+
+  void _parseUptime(String uptimeStr) {
+    final parts = uptimeStr.trim().split(RegExp(r',?\s+'));
+
+    bool found = false;
+    for (int i = 1; i < parts.length; i++) {
+      if (parts[i].startsWith('day')) {
+        stat?.uptime = '${parts[i - 1]} d';
+        found = true;
+        break;
+      } else if (parts[i].startsWith('hour')) {
+        stat?.uptime = '${parts[i - 1]} h';
+        found = true;
+        break;
+      } else if (parts[i].startsWith('minute')) {
+        stat?.uptime = '${parts[i - 1]} m';
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) {
+      stat?.uptime = "?";
+    }
+  }
+
+  void _parseTemp(String tempStr) {
+    if (tempStr.trim().isNotEmpty) {
+      final tempValue = double.tryParse(tempStr.trim());
+      stat?.temp = tempValue != null ? tempValue / 1000 : 0;
+    } else {
+      stat?.temp = 0;
     }
   }
 
@@ -273,7 +400,6 @@ class Server {
       stat?.temp = 0;
     }
   }
-
   Future<void> updateStats() async {
     await getCPU();
     await getMEM();

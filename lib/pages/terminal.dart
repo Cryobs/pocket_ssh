@@ -1,7 +1,10 @@
 import 'package:dartssh2/dartssh2.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:pocket_ssh/services/server_controller.dart';
 import 'package:pocket_ssh/ssh_core.dart';
 import 'package:pocket_ssh/services/secure_storage.dart';
+import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'package:xterm/xterm.dart';
 
@@ -14,25 +17,119 @@ class TerminalScreen extends StatefulWidget {
 
 class _TerminalScreenState extends State<TerminalScreen> {
   late final Terminal terminal = Terminal();
-  Server server = Server(
-      id: "1",
-      name: "Server 1",
-      host: "192.168.10.24",
-      port: 22,
-      username: "server",
-      authType: AuthType.password
-  );
   SSHSession? session;
   bool _isConnected = false;
+  Server? selectedServer;
+
+  static const Color green = Color(0xFF22C55E);
+  static const Color orange = Color(0xFFE5A50A);
+  static const Color red = Color(0xFFE9220C);
+
+
 
   @override
   void initState() {
     super.initState();
-    _initTerminal();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkOnlineServers();
+    });
+  }
+
+  @override
+  void dispose() {
+    session?.close();
+    selectedServer?.disconnect();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
+          Consumer<ServerController>(
+            builder: (context, controller, child) {
+              final servers = controller.getAllServers();
+
+             return DropdownButton<Server>(
+               value: selectedServer,
+               hint: Text("Select a server"),
+               borderRadius: BorderRadius.circular(15),
+               dropdownColor: const Color(0xFF262626),
+               iconEnabledColor: Colors.white,
+               padding: const EdgeInsets.all(12),
+               items: servers.map((option) {
+                 return DropdownMenuItem(
+                   value: option,
+                   child: Row(
+                     mainAxisAlignment: MainAxisAlignment.center,
+                     children: [
+                       Text(
+                         option.name,
+                         style: const TextStyle(color: Colors.white),
+                       ),
+                       const SizedBox(width: 12,),
+                       Text(
+                         option.host,
+                         style: const TextStyle(color: Colors.white38),
+                       ),
+                       const SizedBox(width: 12,),
+                       Row(
+                         mainAxisSize: MainAxisSize.min,
+                         children: [
+                           Text(
+                             option.online ? "Online" : "Offline",
+                             style: TextStyle(
+                               color: option.online ? green : red,
+                               fontSize: 14,
+                             ),
+                           ),
+                           const SizedBox(width: 6),
+                           CircleAvatar(
+                             radius: 5,
+                             backgroundColor: option.online ? green : red,
+                           )
+                         ],
+                       )
+                     ],
+                   ),
+                 );
+               }).toList(),
+               onChanged: (v) {
+                 session?.close();
+                 selectedServer?.disconnect();
+                 setState(() {
+                   selectedServer = v;
+                 });
+                 _initTerminal();
+
+                 // if (v != null) onChanged(v);
+               },
+             );
+            },
+          ),
+          Expanded(
+              child: TerminalView(
+                padding: EdgeInsets.all(5),
+                terminal,
+                autofocus: true,
+                theme: TerminalThemes.whiteOnBlack,
+              ),
+            ),
+          ],
+        )
+      ),
+      backgroundColor: Colors.black,
+    );
   }
 
   Future<void> _initTerminal() async {
-    terminal.write('Connecting to ${server.host}...\r\n');
+    terminal.buffer.clear();
+    terminal.buffer.setCursor(0, 0);
+    terminal.write('Connecting to ${selectedServer?.host}...\r\n');
 
     terminal.onOutput = (data) {
       if (session != null && _isConnected) {
@@ -47,30 +144,24 @@ class _TerminalScreenState extends State<TerminalScreen> {
     };
 
     await _connectToServer();
-    await server.updateStats();
-    print("CPU: ${server.stat?.cpu}%");
-    print("MEM: ${server.stat?.mem}% (${server.stat?.memUsed}/${server.stat?.memTotal})");
-    print("DISK: ${server.stat?.storage}% (${server.stat?.storageUsed}/${server.stat?.storageTotal})");
-    print("TEMP: ${server.stat?.temp} C");
-    print("UPTIME: ${server.stat?.uptime}");
+    await selectedServer?.updateStatsOptimized();
+  }
+
+  void _checkOnlineServers() {
+    final controller = context.read<ServerController>();
+    controller.checkOnlineServers();
   }
 
   Future<void> _connectToServer() async {
     try {
-      await SecureStorageService.saveValue(
-        "server_${server.id}_password",
-        "ZAQ!2wsx",
-      );
-      server.passwordKey = "server_${server.id}_password";
+      await selectedServer?.connect();
 
-      await server.connect();
-
-      if (server.status != ServerStatus.connected) {
+      if (selectedServer?.status != ServerStatus.connected) {
         terminal.write('\r\nFailed to connect\r\n');
         return;
       }
 
-      session = await server.openSession();
+      session = await selectedServer?.openSession();
 
       if (session == null) {
         terminal.write('\r\nFailed to open session\r\n');
@@ -116,23 +207,4 @@ class _TerminalScreenState extends State<TerminalScreen> {
     }
   }
 
-  @override
-  void dispose() {
-    session?.close();
-    server.disconnect();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: TerminalView(
-          terminal,
-          autofocus: true,
-        ),
-      ),
-      backgroundColor: Colors.black,
-    );
-  }
 }

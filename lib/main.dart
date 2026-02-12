@@ -4,6 +4,7 @@ import 'package:pocket_ssh/models/private_key.dart';
 import 'package:pocket_ssh/pages/server_list.dart';
 import 'package:pocket_ssh/pages/settings.dart';
 import 'package:pocket_ssh/pages/template.dart';
+import 'package:pocket_ssh/pages/terminal.dart';
 import 'package:pocket_ssh/services/private_key_controller.dart';
 import 'package:pocket_ssh/services/private_key_repo.dart';
 import 'package:pocket_ssh/services/server_controller.dart';
@@ -50,15 +51,10 @@ void main() async {
       child: Template(
         pages: [
           const ServerList(),
+          TerminalScreen(),
           const Center(
             child: Text(
-              "Page 1",
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-          const Center(
-            child: Text(
-              "Page 2",
+              "Coming soon",
               style: TextStyle(color: Colors.white),
             ),
           ),
