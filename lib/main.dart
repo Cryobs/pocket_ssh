@@ -42,7 +42,7 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (_) => ServerController(
-            settingsController,  // Передаём settingsController
+            settingsController,
             serverRepo,
             privateKeyRepo,
           ),

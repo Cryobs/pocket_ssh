@@ -88,14 +88,13 @@ class _AddServerPageState extends State<AddServerPage> {
     super.dispose();
   }
 
-  // Валидация IP-адреса
   bool _isValidIP(String host) {
     // IPv4
     final ipv4Pattern = RegExp(
         r'^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.){3}(25[0-5]|(2[0-4]|1\d|[1-9]|)\d)$'
     );
 
-    // IPv6 (упрощенная проверка)
+    // IPv6
     final ipv6Pattern = RegExp(
         r'^(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$'
     );
@@ -103,13 +102,11 @@ class _AddServerPageState extends State<AddServerPage> {
     return ipv4Pattern.hasMatch(host) || ipv6Pattern.hasMatch(host);
   }
 
-  // Валидация доменного имени
   bool _isValidDomain(String host) {
     final domainPattern = RegExp(
         r'^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$'
     );
 
-    // Также разрешаем localhost
     if (host.toLowerCase() == 'localhost') {
       return true;
     }
@@ -117,7 +114,6 @@ class _AddServerPageState extends State<AddServerPage> {
     return domainPattern.hasMatch(host);
   }
 
-  // Валидация хоста (IP или домен)
   bool _isValidHost(String host) {
     return _isValidIP(host) || _isValidDomain(host);
   }
@@ -134,7 +130,6 @@ class _AddServerPageState extends State<AddServerPage> {
       return;
     }
 
-    // Валидация хоста
     if (!_isValidHost(host)) {
       _showSnackBar("Please enter a valid IP address or domain name");
       return;

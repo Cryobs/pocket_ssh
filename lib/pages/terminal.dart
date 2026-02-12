@@ -1,9 +1,7 @@
 import 'package:dartssh2/dartssh2.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:pocket_ssh/services/server_controller.dart';
 import 'package:pocket_ssh/ssh_core.dart';
-import 'package:pocket_ssh/services/secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'package:xterm/xterm.dart';
@@ -105,8 +103,6 @@ class _TerminalScreenState extends State<TerminalScreen> {
                    selectedServer = v;
                  });
                  _initTerminal();
-
-                 // if (v != null) onChanged(v);
                },
              );
             },
