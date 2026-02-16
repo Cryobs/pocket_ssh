@@ -40,13 +40,13 @@ class _SettingsPageState extends State<SettingsPage> {
             margin: const EdgeInsets.all(26),
             child: Column(
               children: [
-                const Row(
+                Row(
                   children: [
                     Padding(
-                      padding: EdgeInsets.only(bottom: 13),
+                      padding: const EdgeInsets.only(bottom: 13),
                       child: Text(
-                          "Settings",
-                          style: TextStyle(color: Colors.white, fontSize: 36)
+                        "Settings",
+                        style: Theme.of(context).textTheme.displayLarge,
                       ),
                     ),
                   ],
@@ -56,7 +56,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   height: 650,
                   padding: const EdgeInsets.all(37),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF262626),
+                    color: Theme.of(context).canvasColor,
                     borderRadius: BorderRadius.circular(40),
                   ),
                   child: Column(
@@ -78,13 +78,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         },
                       ),
                       /* DIVIDER */
-                      const Divider(
-                        color: Colors.white38,
-                        thickness: 1,
-                        indent: 0,
-                        endIndent: 0,
-                        height: 20,
-                      ),
+                      const Divider(),
                       const PrivateKeyList(),
                       /* SAVE BUTTON */
                       const Spacer(),
@@ -100,11 +94,6 @@ class _SettingsPageState extends State<SettingsPage> {
                             }
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                            Theme.of(context).colorScheme.secondary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
                             padding: const EdgeInsets.symmetric(
                               horizontal: 40,
                               vertical: 8,
@@ -112,7 +101,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           ),
                           child: const Text(
                             "Save",
-                            style: TextStyle(fontSize: 16),
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                       )
