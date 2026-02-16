@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:pocket_ssh/theme/app_theme.dart';
 
 class InputPass extends StatefulWidget {
   final String hint;
@@ -26,15 +25,15 @@ class _InputPassState extends State<InputPass> {
           child: TextField(
             controller: widget.controller,
             obscureText: _obscureText,
-            cursorColor: AppColors.textPrimaryDark,
+            cursorColor: Colors.white,
             decoration: InputDecoration(
               hintText: widget.hint,
-              hintStyle: const TextStyle(color: AppColors.textSecondaryDark),
+              hintStyle: const TextStyle(color: Colors.white38),
               border: InputBorder.none,
               suffixIcon: IconButton(
                 icon: Icon(
                   _obscureText ? Icons.visibility : Icons.visibility_off,
-                  color: AppColors.textSecondaryDark,
+                  color: Colors.white38,
                 ),
                 onPressed: () {
                   setState(() {
@@ -43,6 +42,7 @@ class _InputPassState extends State<InputPass> {
                 },
               ),
             ),
+            style: const TextStyle(color: Colors.white),
           ),
         )
       ],

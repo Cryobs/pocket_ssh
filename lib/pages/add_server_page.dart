@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:pocket_ssh/theme/app_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:pocket_ssh/services/server_controller.dart';
 import 'package:pocket_ssh/services/private_key_controller.dart';
@@ -210,10 +209,11 @@ class _AddServerPageState extends State<AddServerPage> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text("Delete Server"),
+        backgroundColor: const Color(0xFF262626),
+        title: const Text("Delete Server", style: TextStyle(color: Colors.white)),
         content: const Text(
           "Are you sure you want to delete this server? This action cannot be undone.",
-          style: TextStyle(color: AppColors.textSecondaryDark),
+          style: TextStyle(color: Colors.white70),
         ),
         actions: [
           TextButton(
@@ -222,7 +222,7 @@ class _AddServerPageState extends State<AddServerPage> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text("Delete", style: TextStyle(color: AppColors.errorDark)),
+            child: const Text("Delete", style: TextStyle(color: Color(0xFFE9220C))),
           ),
         ],
       ),
@@ -274,8 +274,9 @@ class _AddServerPageState extends State<AddServerPage> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return const Scaffold(
+        backgroundColor: Colors.black,
         body: Center(
-          child: CircularProgressIndicator(),
+          child: CircularProgressIndicator(color: Colors.white),
         ),
       );
     }
@@ -285,6 +286,7 @@ class _AddServerPageState extends State<AddServerPage> {
     final keyOptions = ['None', ...keys.map((k) => k.name)];
 
     return Scaffold(
+      backgroundColor: Colors.black,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Center(
@@ -296,26 +298,28 @@ class _AddServerPageState extends State<AddServerPage> {
                   Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back),
+                        icon: const Icon(Icons.arrow_back, color: Colors.white),
                         onPressed: () => Navigator.pop(context),
                       ),
                       Expanded(
                         child: Padding(
-                          padding: const EdgeInsets.only(left: 8),
+                          padding: const EdgeInsets.only(bottom: 13, left: 8),
                           child: Text(
                             _isEditing ? "Edit Server" : "Add Server",
-                            style: Theme.of(context).textTheme.displayLarge,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 36,
+                            ),
                           ),
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 13,),
                   Container(
                     width: 355,
                     padding: const EdgeInsets.all(37),
                     decoration: BoxDecoration(
-                      color: AppColors.surfaceDark,
+                      color: const Color(0xFF262626),
                       borderRadius: BorderRadius.circular(40),
                     ),
                     child: Column(
@@ -349,7 +353,13 @@ class _AddServerPageState extends State<AddServerPage> {
                           hint: "root",
                           controller: _usernameController,
                         ),
-                        const Divider(),
+                        const Divider(
+                          color: Colors.white38,
+                          thickness: 1,
+                          indent: 0,
+                          endIndent: 0,
+                          height: 40,
+                        ),
                         InputList(
                           label: 'Auth Type',
                           options: const ['Password', 'SSH Key'],
@@ -400,6 +410,7 @@ class _AddServerPageState extends State<AddServerPage> {
                           child: ElevatedButton(
                             onPressed: _saveServer,
                             style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).colorScheme.secondary,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30),
                               ),
@@ -410,7 +421,7 @@ class _AddServerPageState extends State<AddServerPage> {
                             ),
                             child: Text(
                               _isEditing ? "Update" : "Save",
-                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: AppColors.onPrimary, fontWeight: FontWeight.bold),
+                              style: const TextStyle(fontSize: 16, color: Colors.black),
                             ),
                           ),
                         ),
@@ -426,9 +437,12 @@ class _AddServerPageState extends State<AddServerPage> {
                                   vertical: 12,
                                 ),
                               ),
-                              child: Text(
+                              child: const Text(
                                 "Delete Server",
-                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: AppColors.errorDark)
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 16,
+                                ),
                               ),
                             ),
                           ),

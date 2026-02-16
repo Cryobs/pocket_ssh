@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pocket_ssh/models/private_key.dart';
 import 'package:pocket_ssh/services/private_key_controller.dart';
-import 'package:pocket_ssh/theme/app_theme.dart';
 import 'package:pocket_ssh/widgets/input_big_text.dart';
 import 'package:pocket_ssh/widgets/input_pass.dart';
 import 'package:pocket_ssh/widgets/input_text.dart';
@@ -102,19 +101,20 @@ class _PrivateKeyPageState extends State<PrivateKeyPage> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Delete Key"),
+        backgroundColor: const Color(0xFF262626),
+        title: const Text("Delete Key", style: TextStyle(color: Colors.white)),
         content: const Text(
           "Are you sure you want to delete this key? This action cannot be undone.",
-          style: TextStyle(color: AppColors.textSecondaryDark),
+          style: TextStyle(color: Colors.white70),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text("Cancel",),
+            child: const Text("Cancel"),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text("Delete", style: TextStyle(color: AppColors.errorDark)),
+            child: const Text("Delete", style: TextStyle(color: Color(0xFFE9220C))),
           ),
         ],
       ),
@@ -145,13 +145,15 @@ class _PrivateKeyPageState extends State<PrivateKeyPage> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return const Scaffold(
+        backgroundColor: Colors.black,
         body: Center(
-          child: CircularProgressIndicator(),
+          child: CircularProgressIndicator(color: Colors.white),
         ),
       );
     }
 
     return Scaffold(
+      backgroundColor: Colors.black,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Center(
@@ -161,29 +163,30 @@ class _PrivateKeyPageState extends State<PrivateKeyPage> {
               child: Column(
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back),
+                        icon: const Icon(Icons.arrow_back, color: Colors.white),
                         onPressed: () => Navigator.pop(context),
                       ),
                       Expanded(
                         child: Padding(
-                          padding: const EdgeInsets.only(left: 8),
+                          padding: const EdgeInsets.only(bottom: 13, left: 8),
                           child: Text(
                             _isEditing ? "Edit Private Key" : "Add Private Key",
-                            style: Theme.of(context).textTheme.displayLarge
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 36,
+                            ),
                           ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 13,),
                   Container(
                     width: 355,
                     padding: const EdgeInsets.all(37),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).canvasColor,
+                      color: const Color(0xFF262626),
                       borderRadius: BorderRadius.circular(40),
                     ),
                     child: Column(
@@ -199,7 +202,13 @@ class _PrivateKeyPageState extends State<PrivateKeyPage> {
                           hint: "Key Passphrase (optional)",
                           controller: _passphraseController,
                         ),
-                        const Divider(),
+                        const Divider(
+                          color: Colors.white38,
+                          thickness: 1,
+                          indent: 0,
+                          endIndent: 0,
+                          height: 40,
+                        ),
                         InputBigText(
                           label: "Private Key",
                           controller: _keyController,
@@ -211,17 +220,19 @@ class _PrivateKeyPageState extends State<PrivateKeyPage> {
                           width: double.infinity,
                           child: ElevatedButton(
                             onPressed: _saveKey,
-                            style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
-                              padding: WidgetStateProperty.all(
-                                const EdgeInsets.symmetric(
-                                  horizontal: 40,
-                                  vertical: 12,
-                                ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).colorScheme.secondary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 40,
+                                vertical: 12,
                               ),
                             ),
                             child: Text(
                               _isEditing ? "Update" : "Save",
-                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: AppColors.onPrimary, fontWeight: FontWeight.bold),
+                              style: const TextStyle(fontSize: 16),
                             ),
                           ),
                         ),
@@ -239,9 +250,12 @@ class _PrivateKeyPageState extends State<PrivateKeyPage> {
                                   vertical: 12,
                                 ),
                               ),
-                              child: Text(
+                              child: const Text(
                                 "Delete Key",
-                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: AppColors.errorDark),
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 16,
+                                ),
                               ),
                             ),
                           ),

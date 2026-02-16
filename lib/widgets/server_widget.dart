@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:pocket_ssh/models/server.dart';
-import 'package:pocket_ssh/theme/app_theme.dart';
 import 'package:pocket_ssh/widgets/circle_diagram.dart';
 
 import '../ssh_core.dart';
@@ -24,9 +23,9 @@ class ServerWidget extends StatefulWidget {
 }
 
 class _ServerWidgetState extends State<ServerWidget> {
-  static const Color green = AppColors.successDark;
-  static const Color orange = AppColors.warningDark;
-  static const Color red = AppColors.errorDark;
+  static const Color green = Color(0xFF22C55E);
+  static const Color orange = Color(0xFFE5A50A);
+  static const Color red = Color(0xFFE9220C);
 
   Color _getTempColor(double temp) {
     if (temp < 70) {
@@ -55,7 +54,7 @@ class _ServerWidgetState extends State<ServerWidget> {
           return Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Theme.of(context).canvasColor,
+              color: const Color(0xFF1E1E1E),
               borderRadius: BorderRadius.circular(15),
             ),
             child: Column(
@@ -69,7 +68,11 @@ class _ServerWidgetState extends State<ServerWidget> {
                     Flexible(
                       child: Text(
                         widget.server.name,
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -93,7 +96,11 @@ class _ServerWidgetState extends State<ServerWidget> {
                     )
                   ],
                 ),
-                const Divider(),
+                const Divider(
+                  color: Colors.white38,
+                  thickness: 1,
+                  height: 20,
+                ),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -122,7 +129,7 @@ class _ServerWidgetState extends State<ServerWidget> {
     return Container(
       height: height,
       decoration: BoxDecoration(
-        color: AppColors.surfaceVariantDark,
+        color: Colors.black87,
         borderRadius: BorderRadius.circular(15),
       ),
       child: Row(
@@ -165,7 +172,7 @@ class _ServerWidgetState extends State<ServerWidget> {
     return Container(
       height: height,
       decoration: BoxDecoration(
-        color: AppColors.surfaceVariantDark,
+        color: Colors.black87,
         borderRadius: BorderRadius.circular(15),
       ),
       child: Column(
@@ -195,7 +202,10 @@ class _ServerWidgetState extends State<ServerWidget> {
           fit: BoxFit.scaleDown,
           child: Text(
             label,
-            style: AppTextStyles.bodyMedium,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -205,7 +215,12 @@ class _ServerWidgetState extends State<ServerWidget> {
           fit: BoxFit.scaleDown,
           child: Text(
             value,
-            style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold, height: 0.8, color: valueColor),
+            style: TextStyle(
+              color: valueColor,
+              fontSize: 14,
+              fontWeight: FontWeight.w900,
+              height: 0.8,
+            ),
             textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
