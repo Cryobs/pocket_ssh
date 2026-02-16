@@ -2,6 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:dartssh2/dartssh2.dart';
 import 'services/secure_storage.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'main.dart';
+
 
 const CONNECTION_ATTEMPT = 5;
 
@@ -187,6 +190,7 @@ class Server {
     if (status != ServerStatus.connected || client == null) {
       print("⚠️ Cannot update stats - not connected to $name");
       return;
+
     }
 
     try {
@@ -200,6 +204,22 @@ class Server {
         _parseUptime(parts[3]);
         _parseTemp(parts[4]);
       }
+      void _checkThresholds() {
+        if (stat == null) return;
+
+        if (stat!.cpu > 5) {
+          showAlertNotification(name, "CPU przekroczyło 80% (${stat!.cpu.toStringAsFixed(1)}%)");
+        }
+
+        if (stat!.mem > 5) {
+          showAlertNotification(name, "RAM przekroczył 80% (${stat!.mem.toStringAsFixed(1)}%)");
+        }
+
+        if (stat!.storage > 5) {
+          showAlertNotification(name, "Storage przekroczył 80% (${stat!.storage.toStringAsFixed(1)}%)");
+        }
+      }
+
     } catch (e) {
       if (e.toString().contains('SSHAuthFailError')) {
         print("🔒 Auth error for $name - disconnecting");
@@ -314,4 +334,23 @@ class Statistics {
     this.storageUsed = 0,
     this.storageTotal = 0,
   });
+}
+
+Future<void> showAlertNotification(String title, String body) async {
+  const AndroidNotificationDetails androidDetails = AndroidNotificationDetails('server_alerts',
+      'Server Alerts',
+  channelDescription: 'Powiadomienia o stanie serwera',
+  importance: Importance.max,
+  priority: Priority.high,
+  );
+
+  const NotificationDetails platformDetails =
+      NotificationDetails(android: androidDetails);
+
+  await flutterLocalNotificationsPlugin.show(
+    0,
+    title,
+    body,
+    platformDetails,
+  );
 }
