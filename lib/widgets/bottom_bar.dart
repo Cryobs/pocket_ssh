@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pocket_ssh/theme/app_theme.dart';
 
 class BottomBar extends StatelessWidget {
   final int currentIndex;
@@ -25,18 +26,17 @@ class BottomBar extends StatelessWidget {
   static const double _textSpacing = 6;
   static const int _animDuration = 400;
 
-  static const int _containerColor = 0x00171717;
-  static const int _barColor = 0xFF262626;
-  static const int _highlightColor = 0xFF22C55E;
+  static const Color _containerColor = Colors.transparent;
+  static const Color _barColor = AppColors.surfaceDark;
+  static const Color _highlightColor = AppColors.primaryDark;
 
   static const double _barRadius = 40;
   static const double _highlightRadius = 90;
 
 
-  static final TextStyle _textStyle = TextStyle(
-    color: Colors.black.withOpacity(0.6),
-    fontWeight: FontWeight.w900,
-    fontSize: 14,
+  static final TextStyle _textStyle = AppTextStyles.bodyMedium.copyWith(
+      color: AppColors.onPrimary,
+      fontWeight: FontWeight.bold
   );
 
 
@@ -45,13 +45,13 @@ class BottomBar extends StatelessWidget {
     return SafeArea(
       child: Container(
         height: 90,
-        color: const Color(_containerColor),
+        color: _containerColor,
         child: Center(
           child: Container(
             width: _barWidth,
             height: _barHeight,
             decoration: BoxDecoration(
-              color: const Color(_barColor),
+              color: _barColor,
               borderRadius: BorderRadius.circular(_barRadius),
             ),
             child: LayoutBuilder(
@@ -70,7 +70,7 @@ class BottomBar extends StatelessWidget {
                         width: _itemWidth(currentIndex),
                         height: constraints.maxHeight - (_safePadding * 2),
                         decoration: BoxDecoration(
-                          color: const Color(_highlightColor),
+                          color: _highlightColor,
                           borderRadius: BorderRadius.circular(_highlightRadius),
                         ),
                       ),
@@ -118,8 +118,8 @@ return GestureDetector(
             Icon(
               item.icon,
               color: isSelected
-              ? Colors.black.withOpacity(0.6)
-              : Colors.white.withOpacity(0.3),
+              ? AppColors.onPrimary
+              : AppColors.textSecondaryDark.withAlpha(0x88),
               size: _iconSize,
               ),
             AnimatedSize(duration: const Duration(milliseconds: _animDuration),

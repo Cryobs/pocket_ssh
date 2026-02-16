@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pocket_ssh/theme/app_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:pocket_ssh/widgets/add_server_widget.dart';
 import 'package:pocket_ssh/widgets/server_widget.dart';
@@ -48,15 +49,14 @@ class _ServerListState extends State<ServerList> {
                     ),
                   )),
                   if (servers.isEmpty)
-                    const Padding(
-                      padding: EdgeInsets.only(bottom: 20),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 20),
                       child: Center(
                         child: Text(
                           'No servers yet.\nAdd your first server!',
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white54,
-                            fontSize: 16,
+                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            color: AppColors.textSecondaryDark,
                           ),
                         ),
                       ),
@@ -76,41 +76,24 @@ class _ServerListState extends State<ServerList> {
   void _showServerOptions(BuildContext context, Server server) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF262626),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
       builder: (BuildContext context) {
         return SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                margin: const EdgeInsets.only(top: 12, bottom: 8),
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.white38,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Text(
                   server.name,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: Theme.of(context).textTheme.titleSmall
                 ),
               ),
-              const Divider(color: Colors.white24, height: 1),
+              const Divider(),
               ListTile(
-                leading: const Icon(Icons.edit, color: Colors.white),
-                title: const Text(
+                leading: const Icon(Icons.edit),
+                title: Text(
                   'Edit',
-                  style: TextStyle(color: Colors.white, fontSize: 16),
+                  style: Theme.of(context).textTheme.bodyLarge
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -118,10 +101,10 @@ class _ServerListState extends State<ServerList> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.delete, color: Color(0xFFE9220C)),
-                title: const Text(
+                leading: const Icon(Icons.delete, color: AppColors.errorDark),
+                title: Text(
                   'Delete',
-                  style: TextStyle(color: Color(0xFFE9220C), fontSize: 16),
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: AppColors.errorDark)
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -170,25 +153,23 @@ class _ServerListState extends State<ServerList> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        backgroundColor: const Color(0xFF262626),
         title: const Text(
           "Delete Server",
-          style: TextStyle(color: Colors.white),
         ),
         content: Text(
           "Are you sure you want to delete '${server.name}'? This action cannot be undone.",
-          style: const TextStyle(color: Colors.white70),
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondaryDark),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text("Cancel"),
+            child: Text("Cancel")
           ),
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, true),
             child: const Text(
               "Delete",
-              style: TextStyle(color: Color(0xFFE9220C)),
+              style: TextStyle(color: AppColors.errorDark),
             ),
           ),
         ],
@@ -211,7 +192,7 @@ class _ServerListState extends State<ServerList> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Server deleted'),
-            backgroundColor: Color(0xFF22C55E),
+            backgroundColor: AppColors.primaryDark,
           ),
         );
       }
@@ -220,7 +201,7 @@ class _ServerListState extends State<ServerList> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error deleting server: $e'),
-            backgroundColor: Color(0xFFE9220C),
+            backgroundColor: AppColors.errorDark
           ),
         );
       }

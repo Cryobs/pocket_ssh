@@ -2,6 +2,7 @@ import 'package:dartssh2/dartssh2.dart';
 import 'package:flutter/material.dart';
 import 'package:pocket_ssh/services/server_controller.dart';
 import 'package:pocket_ssh/ssh_core.dart';
+import 'package:pocket_ssh/theme/app_theme.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -20,12 +21,9 @@ class _TerminalScreenState extends State<TerminalScreen> {
   bool _isConnected = false;
   Server? selectedServer;
 
-  StreamSubscription? _stdoutSubscription;
-  StreamSubscription? _stderrSubscription;
-
-  static const Color green = Color(0xFF22C55E);
-  static const Color orange = Color(0xFFE5A50A);
-  static const Color red = Color(0xFFE9220C);
+  static Color successColor = AppColors.successDark;
+  static const Color warningColor = AppColors.warningDark;
+  static const Color errorColor = AppColors.errorDark;
 
   @override
   void initState() {
@@ -66,8 +64,6 @@ class _TerminalScreenState extends State<TerminalScreen> {
                value: selectedServer,
                hint: Text("Select a server"),
                borderRadius: BorderRadius.circular(15),
-               dropdownColor: const Color(0xFF262626),
-               iconEnabledColor: Colors.white,
                padding: const EdgeInsets.all(12),
                items: servers.map((option) {
                  return DropdownMenuItem(
@@ -77,12 +73,14 @@ class _TerminalScreenState extends State<TerminalScreen> {
                      children: [
                        Text(
                          option.name,
-                         style: const TextStyle(color: Colors.white),
+                         style: Theme.of(context).textTheme.bodyMedium,
                        ),
                        const SizedBox(width: 12,),
                        Text(
                          option.host,
-                         style: const TextStyle(color: Colors.white38),
+                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                           color: AppColors.textSecondaryDark
+                         )
                        ),
                        const SizedBox(width: 12,),
                        Row(
@@ -90,15 +88,14 @@ class _TerminalScreenState extends State<TerminalScreen> {
                          children: [
                            Text(
                              option.online ? "Online" : "Offline",
-                             style: TextStyle(
-                               color: option.online ? green : red,
-                               fontSize: 14,
+                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                               color: option.online ? successColor : errorColor,
                              ),
                            ),
                            const SizedBox(width: 6),
                            CircleAvatar(
                              radius: 5,
-                             backgroundColor: option.online ? green : red,
+                             backgroundColor: option.online ? successColor : errorColor,
                            )
                          ],
                        )
@@ -128,7 +125,6 @@ class _TerminalScreenState extends State<TerminalScreen> {
           ],
         ),
       ),
-      backgroundColor: Colors.black,
     );
   }
 

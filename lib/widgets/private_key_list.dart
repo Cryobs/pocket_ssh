@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pocket_ssh/pages/private_key_page.dart';
 import 'package:pocket_ssh/services/private_key_controller.dart';
+import 'package:pocket_ssh/theme/app_theme.dart';
 import 'package:provider/provider.dart';
 
 class PrivateKeyList extends StatelessWidget {
@@ -49,11 +50,11 @@ class PrivateKeyList extends StatelessWidget {
 
     return Column(
       children: [
-        const Align(
+        Align(
           alignment: Alignment.bottomLeft,
           child: Text(
             "Private Keys",
-            style: TextStyle(color: Colors.white, fontSize: 16),
+            style: Theme.of(context).textTheme.bodyLarge,
           ),
         ),
         const SizedBox(height: 12),
@@ -67,11 +68,11 @@ class PrivateKeyList extends StatelessWidget {
                 child: Container(
                   height: 50,
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white38),
+                    border: Border.all(color: AppColors.onSurfaceVariant),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Center(
-                    child: Icon(Icons.add_circle_outline, color: Colors.white38),
+                    child: Icon(Icons.add_circle_outline, color: AppColors.onSurfaceVariant),
                   ),
                 ),
               );
@@ -84,22 +85,19 @@ class PrivateKeyList extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
-                  color: Colors.black38,
+                  color: AppColors.surfaceVariantDark,
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.key, color: Colors.white, size: 20),
+                    const Icon(Icons.key, size: 20),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         keys[index].name,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
+                        style: Theme.of(context).textTheme.bodyLarge
                       ),
                     ),
-                    const Icon(Icons.chevron_right, color: Colors.white38),
+                    const Icon(Icons.chevron_right, color: AppColors.onSurfaceVariant),
                   ],
                 ),
               ),
