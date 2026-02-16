@@ -3,7 +3,7 @@ import 'package:hive/hive.dart';
 
 part 'shortcut_model.g.dart';
 
-@HiveType(typeId: 1)
+@HiveType(typeId: 2)
 class ShortcutModel extends HiveObject {
   @HiveField(0)
   final String id;

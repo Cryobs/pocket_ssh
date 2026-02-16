@@ -21,6 +21,9 @@ class _TerminalScreenState extends State<TerminalScreen> {
   bool _isConnected = false;
   Server? selectedServer;
 
+  StreamSubscription? _stdoutSubscription;
+  StreamSubscription? _stderrSubscription;
+
   static Color successColor = AppColors.successDark;
   static const Color warningColor = AppColors.warningDark;
   static const Color errorColor = AppColors.errorDark;

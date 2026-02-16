@@ -28,14 +28,7 @@ class InputList extends StatelessWidget {
             value: value,
             borderRadius: BorderRadius.circular(20),
             dropdownColor: Theme.of(context).canvasColor,
-            items: options.map((option) {
-              return DropdownMenuItem(
-                value: option,
-                child: Text(
-                  option,
-                ),
-              );
-            }).toList(),
+            items: items,
             onChanged: (v) {
               if (v != null) onChanged(v);
             },

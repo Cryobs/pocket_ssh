@@ -39,14 +39,14 @@ class InputBigText extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: Colors.white38),
             ),
+          ),
             style: const TextStyle(
               color: Colors.white,
               fontFamily: 'monospace',
               fontSize: 12,
             ),
           ),
-        ],
-      ),
+        ]
     );
   }
 }

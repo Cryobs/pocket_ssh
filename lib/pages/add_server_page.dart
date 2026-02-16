@@ -282,7 +282,7 @@ class _AddServerPageState extends State<AddServerPage> {
 
     final privateKeyController = Provider.of<PrivateKeyController>(context);
     final keys = privateKeyController.keys;
-    final keyOptions = ['None', ...keys.map((k) => k.name)];
+    final keyOptions = [const DropdownMenuItem(value: 'None',child: Text('None'),), ...keys.map((k) => DropdownMenuItem(value: k.name,child: Text(k.name),))];
 
     return Scaffold(
       body: SafeArea(
@@ -352,7 +352,6 @@ class _AddServerPageState extends State<AddServerPage> {
                         const Divider(),
                         InputList(
                           label: 'Auth Type',
-                          options: const ['Password', 'SSH Key'],
                           value: _authType,
                           onChanged: (value) {
                             setState(() {
@@ -365,6 +364,10 @@ class _AddServerPageState extends State<AddServerPage> {
                               }
                             });
                           },
+                          items: const [
+                            DropdownMenuItem(value: "Password", child: Text("Password")),
+                            DropdownMenuItem(value: "SSH Key", child: Text("SSH Key")),
+                          ],
                         ),
                         const SizedBox(height: 16),
                         if (_authType == 'Password')
@@ -375,7 +378,6 @@ class _AddServerPageState extends State<AddServerPage> {
                         if (_authType == 'SSH Key')
                           InputList(
                             label: 'SSH Key',
-                            options: keyOptions,
                             value: _selectedKeyName,
                             onChanged: (value) {
                               setState(() {
@@ -392,7 +394,7 @@ class _AddServerPageState extends State<AddServerPage> {
                                   }
                                 }
                               });
-                            },
+                            }, items: keyOptions,
                           ),
                         const SizedBox(height: 40),
                         SizedBox(

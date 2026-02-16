@@ -15,7 +15,7 @@ class InputText extends StatelessWidget {
     required this.label,
     required this.hint,
     this.controller,
-    this.onChanged
+    this.onChanged,
     this.keyboardType,
     this.inputFormatters,
   });
