@@ -29,7 +29,6 @@ class _TemplateState extends State<Template> {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.dark,
       home: Scaffold(
-          backgroundColor: Colors.black,
           body: SafeArea(child: widget.pages[currentIndex]),
           bottomNavigationBar: BottomBar(
             currentIndex: currentIndex,
