@@ -63,19 +63,18 @@ class _SettingsPageState extends State<SettingsPage> {
                     children: [
                       /* REFRESH RATE */
                       InputList(
-                        options: const [
-                          "5 sec",
-                          "10 sec",
-                          "15 sec",
-                          "30 sec",
-                          "45 sec",
-                          "60 sec",
+                        items: [
+                          DropdownMenuItem(value: 5, child: Text("5 sec")),
+                          DropdownMenuItem(value: 10, child: Text("10 sec")),
+                          DropdownMenuItem(value: 15, child: Text("15 sec")),
+                          DropdownMenuItem(value: 30, child: Text("30 sec")),
+                          DropdownMenuItem(value: 45, child: Text("45 sec")),
+                          DropdownMenuItem(value: 60, child: Text("60 sec")),
                         ],
                         label: "Refresh Rate",
-                        value: "${settings.draft.refreshRate} sec",
+                        value: settings.draft.refreshRate,
                         onChanged: (v) {
-                          final value = int.parse(v.split(" ").first);
-                          settings.setRefreshRateDraft(value);
+                          settings.setRefreshRateDraft(v);
                         },
                       ),
                       /* DIVIDER */

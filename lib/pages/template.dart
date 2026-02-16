@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pocket_ssh/widgets/bottom_bar.dart';
+import 'package:pocket_ssh/pages/shortcuts_page.dart';
 
 
 
