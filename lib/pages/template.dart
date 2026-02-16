@@ -4,7 +4,6 @@ import 'package:pocket_ssh/pages/shortcuts_page.dart';
 
 
 
-
 class Template extends StatefulWidget {
   final List<Widget> pages;
 
@@ -20,16 +19,16 @@ class Template extends StatefulWidget {
 class _TemplateState extends State<Template> {
   int currentIndex = 0;
 
-  static const int _primaryColor = 0xFF262626;
-  static const int _accentColor = 0xFF22C55E;
+  static const Color _primaryColor = Color(0xFF262626);
+  static const Color _accentColor = Color(0xFF22C55E);
 
-  static MaterialColor primarySwatch = const MaterialColor(_primaryColor, {
+  static MaterialColor primarySwatch = const MaterialColor(500, {
       50: Color(0xFFE6E6E6),
       100: Color(0xFFBFBFBF),
       200: Color(0xFF535353),
       300: Color(0xFF575757),
       400: Color(0xFF4D4D4D),
-      500: Color(_primaryColor),
+      500: _primaryColor,
       600: Color(0xFF1F1F1F),
       700: Color(0xFF171717),
       800: Color(0xFF101010),
@@ -41,11 +40,14 @@ class _TemplateState extends State<Template> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      /* Theme */
       theme: ThemeData(
-        primaryColor: const Color(_primaryColor),
+        brightness: Brightness.dark,
+        primaryColor: _primaryColor,
         colorScheme: ColorScheme.fromSwatch(
           primarySwatch: primarySwatch,
-          accentColor: const Color(_accentColor),
+          accentColor: _accentColor,
+          brightness: Brightness.dark
         )
       ),
       home: Scaffold(

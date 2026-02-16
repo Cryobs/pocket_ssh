@@ -77,7 +77,6 @@ class PrivateKeyList extends StatelessWidget {
               );
             }
 
-            // Элемент списка
             return GestureDetector(
               onTap: () => _navigateToEditKey(context, keys[index].id),
               child: Container(

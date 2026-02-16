@@ -23,6 +23,7 @@ class PrivateKey extends HiveObject {
     this.passphrase,
   });
 
+
   PrivateKey copyWith({
     String? id,
     String? name,

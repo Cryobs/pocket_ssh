@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class InputText extends StatelessWidget {
   final String label;
   final String hint;
   final TextEditingController? controller;
   final void Function(String)? onChanged;
+  final TextInputType? keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
 
   const InputText({
     super.key,
@@ -12,6 +15,8 @@ class InputText extends StatelessWidget {
     required this.hint,
     this.controller,
     this.onChanged
+    this.keyboardType,
+    this.inputFormatters,
   });
 
   @override
@@ -25,6 +30,8 @@ class InputText extends StatelessWidget {
               child: TextField(
                 controller: controller,
                 cursorColor: Colors.white,
+                keyboardType: keyboardType,
+                inputFormatters: inputFormatters,
                 decoration: InputDecoration(
                   hintText: hint,
                   hintStyle: const TextStyle(color: Colors.white38, fontSize: 16),
@@ -34,7 +41,10 @@ class InputText extends StatelessWidget {
                 style: const TextStyle(color: Colors.white, fontSize: 16),
                 onChanged: onChanged,
               ),
-            )
+              textAlign: TextAlign.end,
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
         )
       ],
     );
