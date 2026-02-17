@@ -10,7 +10,7 @@ import 'package:pocket_ssh/services/private_key_repo.dart';
 import 'package:pocket_ssh/services/server_controller.dart';
 import 'package:pocket_ssh/services/server_repo.dart';
 import 'package:pocket_ssh/services/settings_storage.dart';
-import 'package:pocket_ssh/services/notification_service.dart'; // ← tylko ten import
+import 'package:pocket_ssh/services/notifi.dart'; // ← tylko ten import
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'models/server.dart';
@@ -32,7 +32,7 @@ Future<void> main() async {
   final settingsRepo = SettingsRepository(prefs);
   final settingsController = SettingsController(settingsRepo);
 
-  await NotificationService.init(); // ← tylko raz
+  await NotificationService.init(); //
 
   runApp(
     MultiProvider(

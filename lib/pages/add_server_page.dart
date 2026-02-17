@@ -191,7 +191,7 @@ class _AddServerPageState extends State<AddServerPage> {
         _showSnackBar("Server updated successfully");
       } else {
         await controller.addServer(server);
-        await NotificationService.showServerAdded(_nameController.text.trim())
+        await NotificationService.showServerAdded(_nameController.text.trim());
         _showSnackBar("Server saved successfully");
       }
       if (mounted) {

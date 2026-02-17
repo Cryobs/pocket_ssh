@@ -4,7 +4,7 @@ import 'package:dartssh2/dartssh2.dart';
 import 'services/secure_storage.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'main.dart';
-
+import 'package:pocket_ssh/services/notifi.dart';
 
 const CONNECTION_ATTEMPT = 5;
 
@@ -336,16 +336,21 @@ class Statistics {
   });
 }
 
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+FlutterLocalNotificationsPlugin();
+
 Future<void> showAlertNotification(String title, String body) async {
-  const AndroidNotificationDetails androidDetails = AndroidNotificationDetails('server_alerts',
-      'Server Alerts',
-  channelDescription: 'Powiadomienia o stanie serwera',
-  importance: Importance.max,
-  priority: Priority.high,
+  const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+    'server_alerts',
+    'Server Alerts',
+    channelDescription: 'Powiadomienia o stanie serwera',
+    importance: Importance.max,
+    priority: Priority.high,
   );
 
   const NotificationDetails platformDetails =
-      NotificationDetails(android: androidDetails);
+  NotificationDetails(android: androidDetails);
 
   await flutterLocalNotificationsPlugin.show(
     0,
