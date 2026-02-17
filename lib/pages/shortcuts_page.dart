@@ -107,7 +107,12 @@ class _ShortcutsPageState extends State<ShortcutsPage>
   }
 
   Widget _tile(ShortcutModel shortcut) {
-    return GestureDetector(
+    return EditableShortcutTile(
+      key: ValueKey(shortcut.id),
+      shortcut: shortcut,
+      onEdit: () => _editShortcut(shortcut),
+      onDelete: () => _removeShortcut(shortcut.id),
+
       onTap: () async {
         final controller = context.read<ServerController>();
         final server = controller.getServer(shortcut.serverId);
@@ -116,13 +121,6 @@ class _ShortcutsPageState extends State<ShortcutsPage>
 
         await server.execScript(shortcut);
 
-      },
-      child: EditableShortcutTile(
-        key: ValueKey(shortcut.id),
-        shortcut: shortcut,
-        onEdit: () => _editShortcut(shortcut),
-        onDelete: () => _removeShortcut(shortcut.id),
-      ),
-    );
+      },      );
   }
 }

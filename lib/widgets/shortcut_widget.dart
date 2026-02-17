@@ -6,12 +6,14 @@ class EditableShortcutTile extends StatefulWidget {
   final ShortcutModel shortcut;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
+  final VoidCallback? onTap;
 
   const EditableShortcutTile({
     super.key,
     required this.shortcut,
     required this.onEdit,
     required this.onDelete,
+    this.onTap,
   });
 
   @override
@@ -29,7 +31,7 @@ class _EditableShortcutTileState extends State<EditableShortcutTile> {
       onTapDown: (_) => setState(() => _pressed = true),
       onTapUp: (_) => setState(() => _pressed = false),
       onTapCancel: () => setState(() => _pressed = false),
-      onTap: () {},
+      onTap: widget.onTap,
       child: AnimatedScale(
         scale: _pressed ? 0.93 : 1.0,
         duration: const Duration(milliseconds: 0),

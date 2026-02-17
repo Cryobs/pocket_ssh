@@ -60,6 +60,7 @@ class _ShortcutFormPageState extends State<ShortcutFormPage> {
       _titleController = TextEditingController();
       _icon = Icons.apps;
       _color = Colors.deepPurple;
+      _serverId = '';
     }
 
     _titleController.addListener(() {
@@ -199,90 +200,96 @@ class _ShortcutFormPageState extends State<ShortcutFormPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            // PREVIEW
-            EditableShortcutTile(
-              shortcut: ShortcutModel(
-                  id: "Preview_Shortcut",
-                  title: _titleController.text.isEmpty
-                          ? 'Preview'
-                          : _titleController.text,
-                  iconCodePoint: _icon.codePoint,
-                  colorValue: _color.value,
-                  order: 1,
-                  serverId: '',
-                  script: ''
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              // PREVIEW
+              EditableShortcutTile(
+                shortcut: ShortcutModel(
+                    id: "Preview_Shortcut",
+                    title: _titleController.text.isEmpty
+                            ? 'Preview'
+                            : _titleController.text,
+                    iconCodePoint: _icon.codePoint,
+                    colorValue: _color.value,
+                    order: 1,
+                    serverId: '',
+                    script: ''
+                ),
+                onEdit: () {  },
+                onDelete: () {  },
               ),
-              onEdit: () {  },
-              onDelete: () {  },
-            ),
+          
+              const SizedBox(height: 24),
+          
+              // NAME
+              InputText(label: "Name", hint: "My Shortcut", controller: _titleController, onChanged: (_) => setState(() { }),),
+              // SERVER
+              Consumer<ServerController>(
+                  builder: (context, controller, child) {
+                    final servers = controller.getAllServers();
 
-            const SizedBox(height: 24),
+                    if (!isEdit && servers.isNotEmpty && _serverId.isEmpty) {
+                      _serverId = servers[0].id;
+                    }
 
-            // NAME
-            InputText(label: "Name", hint: "My Shortcut", controller: _titleController, onChanged: (_) => setState(() { }),),
-            // SERVER
-            Consumer<ServerController>(
-                builder: (context, controller, child) {
-                  final servers = controller.getAllServers();
-                  
-                  return InputList(
-                    label: "Server",
-                    items: servers.map((server) {
-                      return DropdownMenuItem(
-                        value: server.id,
-                        child: Text(server.name),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _serverId = value;
-                      });
-                    }, value: isEdit ? _serverId : servers[0].id,
+                    return InputList(
+                      label: "Server",
+                      items: servers.map((server) {
+                        return DropdownMenuItem(
+                          value: server.id,
+                          child: Text(server.name),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _serverId = value;
+                        });
+                      }, value: _serverId,
+                    );
+              }),
+              
+              const Divider(
+                color: Colors.white38,
+                thickness: 1,
+                indent: 0,
+                endIndent: 0,
+                height: 20,
+              ),
+          
+          
+              // SCRIPT
+              InputBigText(label: "Script", hint: "Write a shortcut script", controller: _scriptController,),
+          
+          
+          
+              const SizedBox(height: 24),
+          
+              // ICON PICKER
+              Wrap(
+                spacing: 12,
+                children: _icons.map((i) {
+                  return GestureDetector(
+                    onTap: () => setState(() => _icon = i),
+                    child: CircleAvatar(
+                      backgroundColor:
+                      _icon == i ? AppColors.successDark : AppColors.surfaceDark,
+                      child: Icon(i, color: Colors.white),
+                    ),
                   );
-            }),
-            
-            const Divider(
-              color: Colors.white38,
-              thickness: 1,
-              indent: 0,
-              endIndent: 0,
-              height: 20,
-            ),
-
-
-            // SCRIPT
-            InputBigText(label: "Script", hint: "Write a shortcut script", controller: _scriptController,),
-
-
-
-            const SizedBox(height: 24),
-
-            // ICON PICKER
-            Wrap(
-              spacing: 12,
-              children: _icons.map((i) {
-                return GestureDetector(
-                  onTap: () => setState(() => _icon = i),
-                  child: CircleAvatar(
-                    backgroundColor:
-                    _icon == i ? AppColors.successDark : AppColors.surfaceDark,
-                    child: Icon(i, color: Colors.white),
-                  ),
-                );
-              }).toList(),
-            ),
-
-            const SizedBox(height: 24),
-
-            // COLOR
-            ElevatedButton.icon(
-              onPressed: _pickColor,
-              icon: const Icon(Icons.color_lens),
-              label: const Text('Pick color'),
-            ),
-          ],
+                }).toList(),
+              ),
+          
+              const SizedBox(height: 24),
+          
+              // COLOR
+              ElevatedButton.icon(
+                onPressed: _pickColor,
+                icon: const Icon(Icons.color_lens),
+                label: const Text('Pick color'),
+              ),
+            ],
+          ),
         ),
       ),
     );
