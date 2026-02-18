@@ -156,28 +156,24 @@ class Server {
       output: '',
       finished: false,
     );
+
     box.put(run.id, run);
 
-    final dirPath = r'$HOME/.observer';
-    final logPath = '$dirPath/observer_app_${shortcut.id}_${run.id}.log';
-
     try {
-      await exec('mkdir -p $dirPath');
+      final result = await exec(
+        "bash -c '${shortcut.script.replaceAll("'", "'\\''")}'",
+      );
 
-      final cmd = '''
-nohup bash -c '${shortcut.script.replaceAll("'", "'\\''")}' \
-> $logPath 2>&1 &
-''';
-      await exec(cmd);
-
-      final result = await exec('cat $logPath');
       final clean = stripAnsi(result);
 
-      final updatedRun = run..output = clean..finished = true;
-      box.put(run.id, updatedRun);
+      run.output = clean.isNotEmpty ? clean : "✔ Script finished (no output)";
+      run.finished = true;
+
+      box.put(run.id, run);
     } catch (e) {
-      final errorRun = run..output = 'Error: $e'..finished = true;
-      box.put(run.id, errorRun);
+      run.output = "❌ Error: $e";
+      run.finished = true;
+      box.put(run.id, run);
     }
   }
 
