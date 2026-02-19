@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pocket_ssh/models/server.dart';
 import 'package:pocket_ssh/theme/app_theme.dart';
 import 'package:pocket_ssh/widgets/circle_diagram.dart';
+import 'package:pocket_ssh/widgets/online_indicator.dart';
 
 import '../ssh_core.dart';
 
@@ -74,23 +75,7 @@ class _ServerWidgetState extends State<ServerWidget> {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          widget.online ? "Online" : "Offline",
-                          style: TextStyle(
-                            color: widget.online ? green : red,
-                            fontSize: 14,
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        CircleAvatar(
-                          radius: 5,
-                          backgroundColor: widget.online ? green : red,
-                        )
-                      ],
-                    )
+                    OnlineIndicator(online: widget.online),
                   ],
                 ),
                 const Divider(),
