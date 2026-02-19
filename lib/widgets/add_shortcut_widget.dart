@@ -18,18 +18,7 @@ class AddShortcutTile extends StatelessWidget {
         height: 175,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(22),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.white.withOpacity(0.08),
-              Colors.white.withOpacity(0.02),
-            ],
-          ),
-          border: Border.all(
-            color: Colors.white.withOpacity(0.08),
-            width: 1,
-          ),
+          color: AppColors.surfaceVariantDark,
         ),
         child: Center(
           child: Container(
@@ -37,7 +26,7 @@ class AddShortcutTile extends StatelessWidget {
             height: 48,
             child: const Icon(
               Icons.add_circle_outline,
-              color: AppColors.textSecondaryDark,
+              color: AppColors.onSurfaceVariant,
               size: 48,
             ),
           ),
