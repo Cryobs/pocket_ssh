@@ -119,7 +119,7 @@ return GestureDetector(
               item.icon,
               color: isSelected
               ? AppColors.onPrimary
-              : AppColors.textSecondaryDark.withAlpha(0x88),
+              : AppColors.textPrimaryDark.withAlpha(0x55),
               size: _iconSize,
               ),
             AnimatedSize(duration: const Duration(milliseconds: _animDuration),

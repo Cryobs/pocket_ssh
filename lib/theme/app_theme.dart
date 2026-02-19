@@ -12,6 +12,7 @@ class AppColors {
   /* Text */
   static const textPrimaryDark = Color(0xFFFFFFFF);
   static const textSecondaryDark = Color(0xFF9A9A9A);
+  static const textDisabledDark = Color(0xFF666668);
   static const onPrimary = Color(0xAA000000);
   static const onSurfaceVariant = Colors.white38;
 
@@ -23,6 +24,8 @@ class AppColors {
   /* Divider */
   static const dividerDark = Color(0xFF676767);
 
+  /* Buttons */
+  static const btnOnSurface = Color(0xFF2C2C2E);
 }
 
 class AppTextStyles {
