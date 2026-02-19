@@ -10,7 +10,12 @@ import 'services/secure_storage.dart';
 const CONNECTION_ATTEMPT = 5;
 
 const ALL_STATS_CMD = '''
-cpu_usage=\$(top -bn1 | grep 'Cpu(s)' | awk '{print 100 - \$8}')
+read cpu1 < /proc/stat
+sleep 0.3
+read cpu2 < /proc/stat
+set -- \$cpu1; idle1=\$5; t1=\$((\$2+\$3+\$4+\$5+\$6+\$7+\$8))
+set -- \$cpu2; idle2=\$5; t2=\$((\$2+\$3+\$4+\$5+\$6+\$7+\$8))
+cpu_usage=\$(awk "BEGIN {printf \\"%.1f\\", 100-((\$idle2-\$idle1)/(\$t2-\$t1)*100)}")
 mem_info=\$(free -b | awk '/Mem:/ {printf("%d %d", \$3, \$2)}')
 storage_info=\$(df --block-size=1 --total | awk '/total/ {print \$3, \$2}')
 uptime_info=\$(uptime -p)
@@ -18,8 +23,7 @@ temp_info=\$(cat /sys/class/hwmon/hwmon*/temp1_input 2>/dev/null | head -n1)
 echo "\$cpu_usage|\$mem_info|\$storage_info|\$uptime_info|\$temp_info"
 ''';
 
-const CPU_USAGE_CMD = "top -bn1 | grep 'Cpu(s)' | awk '{print 100 - \$8}'";
-const CPU_USAGE_CMD_ALT = "mpstat 1 1 | awk '/Average/ {print 100 - \$NF}'";
+const CPU_USAGE_CMD = "awk '/cpu / {idle=\$5; total=\$2+\$3+\$4+\$5+\$6+\$7+\$8; print 100-(idle/total*100)}' /proc/stat";const CPU_USAGE_CMD_ALT = "mpstat 1 1 | awk '/Average/ {print 100 - \$NF}'";
 
 final STORAGE_USAGE_CMD = "df --block-size=1 --total | awk '/total/ {print \$3, \$2}'";
 const UPTIME_CMD = "uptime -p";
