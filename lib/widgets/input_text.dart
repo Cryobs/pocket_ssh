@@ -22,27 +22,35 @@ class InputText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Text(label, style: Theme.of(context).textTheme.bodyLarge),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.only(left: 8),
-            child: TextField(
-              controller: controller,
-              cursorColor: AppColors.textPrimaryDark,
-              keyboardType: keyboardType,
-              inputFormatters: inputFormatters,
-              decoration: InputDecoration(
-                hintText: hint,
-                hintStyle: const TextStyle(color: AppColors.textSecondaryDark),
-                border: InputBorder.none,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: Theme.of(context).textTheme.bodyLarge),
+          SizedBox(height: 8,),
+          TextField(
+            controller: controller,
+            cursorColor: AppColors.textPrimaryDark,
+            keyboardType: keyboardType,
+            inputFormatters: inputFormatters,
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: const TextStyle(color: AppColors.textSecondaryDark),
+              filled: true,
+              fillColor: Colors.white12,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Colors.white38),
               ),
-              textAlign: TextAlign.end,
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Colors.white38),
+              ),
             ),
-          ),
-        )
-      ],
+          )
+        ],
+      ),
     );
   }
 }
