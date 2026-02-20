@@ -7,6 +7,7 @@ import 'package:pocket_ssh/pages/shortcut_form_page.dart';
 import 'package:provider/provider.dart';
 
 import '../services/server_controller.dart';
+import '../theme/app_theme.dart';
 
 class ShortcutsPage extends StatefulWidget {
   const ShortcutsPage({super.key});
@@ -65,44 +66,63 @@ class _ShortcutsPageState extends State<ShortcutsPage>
   Widget build(BuildContext context) {
     super.build(context);
 
-    return GridView.count(
-      padding: const EdgeInsets.all(19),
-      crossAxisCount: 2,
-      crossAxisSpacing: 16,
-      mainAxisSpacing: 16,
+    return Column(
       children: [
-        ..._shortcuts.map((s) {
-          return LongPressDraggable<ShortcutModel>(
-            data: s,
-            feedback: Material(
-              color: Colors.transparent,
-              child: SizedBox(
-                width: 175,
-                height: 175,
-                child: _tile(s),
+        if (_shortcuts.isEmpty)
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Center(
+              child: Text(
+                'No shortcuts yet.\nAdd your first shortcut!',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: AppColors.textSecondaryDark,
+                ),
               ),
             ),
-            childWhenDragging: Opacity(
-              opacity: 0.4,
-              child: _tile(s),
-            ),
-            child: DragTarget<ShortcutModel>(
-              onAccept: (dragged) {
-                setState(() {
-                  final from = _shortcuts.indexOf(dragged);
-                  final to = _shortcuts.indexOf(s);
-                  _shortcuts.removeAt(from);
-                  _shortcuts.insert(to, dragged);
-                });
-                _repo.saveOrder(_shortcuts);
-              },
-              builder: (_, __, ___) => _tile(s),
-            ),
-          );
-        }),
+          ),
+        Expanded(
+          child: GridView.count(
+            padding: const EdgeInsets.all(19),
+            crossAxisCount: 2,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            children: [
+              ..._shortcuts.map((s) {
+                return LongPressDraggable<ShortcutModel>(
+                  data: s,
+                  feedback: Material(
+                    color: Colors.transparent,
+                    child: SizedBox(
+                      width: 175,
+                      height: 175,
+                      child: _tile(s),
+                    ),
+                  ),
+                  childWhenDragging: Opacity(
+                    opacity: 0.4,
+                    child: _tile(s),
+                  ),
+                  child: DragTarget<ShortcutModel>(
+                    onAccept: (dragged) {
+                      setState(() {
+                        final from = _shortcuts.indexOf(dragged);
+                        final to = _shortcuts.indexOf(s);
+                        _shortcuts.removeAt(from);
+                        _shortcuts.insert(to, dragged);
+                      });
+                      _repo.saveOrder(_shortcuts);
+                    },
+                    builder: (_, __, ___) => _tile(s),
+                  ),
+                );
+              }),
 
-        AddShortcutTile(onAdd: _addShortcut),
-      ],
+              AddShortcutTile(onAdd: _addShortcut),
+            ],
+          ),
+        ),
+      ]
     );
   }
 
