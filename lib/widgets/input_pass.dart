@@ -30,7 +30,16 @@ class _InputPassState extends State<InputPass> {
             decoration: InputDecoration(
               hintText: widget.hint,
               hintStyle: const TextStyle(color: AppColors.textSecondaryDark),
-              border: InputBorder.none,
+              filled: true,
+              fillColor: Colors.white12,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Colors.white38),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Colors.white38),
+              ),
               suffixIcon: IconButton(
                 icon: Icon(
                   _obscureText ? Icons.visibility : Icons.visibility_off,
